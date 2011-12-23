@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Varda</title>
+    <meta name="description" content="Varda database for genomic variants">
+    <meta name="author" content="Leiden University Medical Center">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link rel="stylesheet/less" href="bootstrap/bootstrap.less" media="all" />
+    <link rel="stylesheet/less" href="stylesheets/varda.less" media="all" />
+    <script src="scripts/less-1.1.5.min.js"></script>
+
+    <script src="scripts/jquery-1.7.1.min.js"></script>
+    <script src="scripts/jquery.base64.min.js"></script>
+    <script src="scripts/mustache.js"></script>
+    <script src="sammy/sammy.js"></script>
+    <script src="sammy/plugins/sammy.mustache.js"></script>
+    <script src="scripts/coffee-script.js"></script>
+    <script src="scripts/varda.coffee" type="text/coffeescript"></script>
+
+    <!-- Le fav and touch icons -->
+    <!--
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+    -->
+  </head>
+  <body>
+
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="/">Varda</a>
+          <ul class="nav">
+            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+          <form class="pull-right" action="/authenticate" method="post" id="form-authenticate">
+            <input class="input-small" type="text" placeholder="Login" name="login">
+            <input class="input-small" type="password" placeholder="Password" name="password">
+            <button class="btn" type="submit">Authenticate</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="content">
+        <div class="page-header" id="header">
+          <h1>Welcome <small>to the Varda variant database</small></h1>
+        </div>
+        <div class="row">
+          <div class="span10" id="main"></div>
+          <div class="span4" id="sidebar">
+            <div id="userbar"></div>
+            <h3>Actions</h3>
+            <p><a href="/status">Check status</a></p>
+            <p>List samples</p>
+            <p>Add sample</p>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <p>&copy; Leiden University Medical Center 2011</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>
