@@ -1,3 +1,31 @@
+<form action="/samples" method="post">
+  <fieldset>
+    <legend>Add sample</legend>
+    <div class="clearfix">
+      <label>Sample name</label>
+      <div class="input">
+        <input type="text" name="name">
+      </div>
+    </div>
+    <div class="clearfix">
+      <label>Coverage threshold</label>
+      <div class="input">
+        <input type="text" class="mini" name="coverage_threshold">
+      </div>
+    </div>
+    <div class="clearfix">
+      <label>Pool size</label>
+      <div class="input">
+        <input type="text" class="mini" name="pool_size">
+      </div>
+    </div>
+    <div class="actions">
+      <button type="submit" class="btn primary">Add sample</button>
+      <button type="reset" class="btn">Cancel</button>
+    </div>
+  </fieldset>
+</form>
+
 <table class="zebra-striped">
   <thead><tr><th>Added</th><th>Name</th></tr></thead>
   <tbody>

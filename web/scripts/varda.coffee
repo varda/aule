@@ -3,6 +3,9 @@
 # For templating, we currently use Moustache templates via Sammy, but if we
 # need more logic we might switch to something like JsRender or eco.
 #
+# Todo: Some sort of message mechanism (unobtrusive popups at bottom of screen
+#     or something), i.e. to show authentication failures and other messages.
+#
 # https://github.com/BorisMoore/jsrender
 # https://github.com/sstephenson/eco
 #
@@ -54,6 +57,7 @@ app = Sammy '#main', ->
                 @app.user = r.authentication.user
                 @app.trigger 'authentication'
             dataType: 'json'
+        return
 
     # List samples
     @get '/samples', ->
@@ -70,6 +74,20 @@ app = Sammy '#main', ->
             success: (r) => @partial '/templates/sample.mustache', r
             statusCode: statusHandlers this
             dataType: 'json'
+
+    # Add sample
+    @post '/samples', ->
+        $.ajax '/api/v1/samples',
+            beforeSend: addAuthHeader
+            data:
+                name: @params['name']
+                coverage_threshold: @params['coverage_threshold']
+                pool_size: @params['pool_size']
+            success: (r) => @redirect "/samples/#{ r.sample.id }"
+            statusCode: statusHandlers this
+            dataType: 'json'
+            type: 'POST'
+        return
 
     # Authentication event
     @bind 'authentication', =>
@@ -102,7 +120,8 @@ $ ->
         $('#userbar').empty()
 
     # Todo: .live is deprecated
-    $('tbody tr').live 'click', ->
+    $('tbody tr').live 'click', (e) ->
+        e.preventDefault()
         # Todo: Better to just trigger the a.click event?
         app.setLocation $(this).find('td a').first().attr('href')
 
