@@ -1,0 +1,12 @@
+<table class="zebra-striped">
+  <thead><tr><th>Added</th><th>Name</th><th>Filetype</th></tr></thead>
+  <tbody>
+    {{#data_sources}}
+    <tr>
+      <td><a href="data_sources/{{id}}">{{added}}</a></td>
+      <td>{{name}}</td>
+      <td>{{filetype}}</td>
+    </tr>
+    {{/data_sources}}
+  </tbody>
+</table>

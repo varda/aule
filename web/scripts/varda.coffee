@@ -89,6 +89,14 @@ app = Sammy '#main', ->
             type: 'POST'
         return
 
+    # List data sources
+    @get '/data_sources', ->
+        $.ajax '/api/v1/data_sources',
+            beforeSend: addAuthHeader
+            success: (r) => @partial '/templates/data_sources.mustache', r
+            statusCode: statusHandlers this
+            dataType: 'json'
+
     # List users
     @get '/users', ->
         $.ajax '/api/v1/users',
