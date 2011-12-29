@@ -3,8 +3,6 @@
 # For templating, we currently use Moustache templates via Sammy, but if we
 # need more logic we might switch to something like JsRender or eco.
 #
-# Todo: Possibly auto reload current page after (re-)authenticating?
-#
 # https://github.com/BorisMoore/jsrender
 # https://github.com/sstephenson/eco
 #
@@ -14,28 +12,6 @@
 # Create HTTP Basic Authentication header value
 makeBasicAuth = (login, password) ->
     'Basic ' + $.base64.encode (login + ':' + password)
-
-
-# Set authentication state
-setAuthentication = (user) ->
-    clearAuthentication()
-    if user?
-        state = 'success'
-        showUser user
-    else
-        state = 'fail'
-    $('#form-authenticate').addClass state
-
-
-# Clear authentication state
-clearAuthentication = ->
-    $('#form-authenticate').removeClass 'success fail'
-    $('#userbar').empty()
-
-
-# Show user in sidebar
-showUser = (user) ->
-    $('#userbar').empty().append $("<h3>#{ user.name }</h3><p>Roles: #{ user.roles.join ', ' }</p>")
 
 
 # Our Sammy application
@@ -49,6 +25,15 @@ app = Sammy '#main', ->
     @login = undefined
     @password = undefined
 
+    # Add HTTP Basic Authentication header to request
+    addAuthHeader = (r) =>
+        r.setRequestHeader 'Authorization', makeBasicAuth @login, @password
+
+    # Common handlers for response status codes
+    # Todo: It is unfortunate that we need the context here to call partial...
+    statusHandlers = (context) ->
+        401: -> context.partial '/templates/401.mustache'
+
     # Index
     @get '/', ->
         @$element().html 'Haha, this is the index :)'
@@ -56,7 +41,7 @@ app = Sammy '#main', ->
     # Status
     @get '/status', ->
         $.ajax '/api/v1/',
-            success: (r) => @partial '/templates/status.mustache', status: r.api.status
+            success: (r) => @partial '/templates/status.mustache', r.api
             dataType: 'json'
 
     # Authenticate
@@ -64,8 +49,7 @@ app = Sammy '#main', ->
         @app.login = @params['login']
         @app.password = @params['password']
         $.ajax '/api/v1/authentication',
-            beforeSend: (r) =>
-                r.setRequestHeader 'Authorization', makeBasicAuth @app.login, @app.password
+            beforeSend: addAuthHeader
             success: (r) =>
                 @app.user = r.authentication.user
                 @app.trigger 'authentication'
@@ -74,24 +58,30 @@ app = Sammy '#main', ->
     # List samples
     @get '/samples', ->
         $.ajax '/api/v1/samples',
-            beforeSend: (r) =>
-                r.setRequestHeader 'Authorization', makeBasicAuth @app.login, @app.password
-            success: (r) => @partial '/templates/samples.mustache', samples: r.samples
-            statusCode: 401: => @partial '/templates/401.mustache'
+            beforeSend: addAuthHeader
+            success: (r) => @partial '/templates/samples.mustache', r
+            statusCode: statusHandlers this
             dataType: 'json'
 
     # Show sample
     @get '/samples/:sample', ->
         $.ajax "/api/v1/samples/#{ @params['sample'] }",
-            beforeSend: (r) =>
-                r.setRequestHeader 'Authorization', makeBasicAuth @app.login, @app.password
-            success: (r) => @partial '/templates/sample.mustache', sample: r.sample
-            statusCode: 401: => @partial '/templates/401.mustache'
+            beforeSend: addAuthHeader
+            success: (r) => @partial '/templates/sample.mustache', r
+            statusCode: statusHandlers this
             dataType: 'json'
 
     # Authentication event
     @bind 'authentication', =>
-        setAuthentication @user
+        $('#form-authenticate').removeClass 'success fail'
+        $('#userbar').empty()
+        if @user?
+            state = 'success'
+            $('#userbar').append $("<h3>#{ @user.name }</h3>
+                                    <p>Roles: #{ @user.roles.join ', ' }</p>")
+        else
+            state = 'fail'
+        $('#form-authenticate').addClass state
         @refresh()
 
 
@@ -107,7 +97,9 @@ $ ->
             false
 
     # Clear the authentication status when we type
-    $('#form-authenticate input').bind 'input',  -> clearAuthentication()
+    $('#form-authenticate input').bind 'input', ->
+        $('#form-authenticate').removeClass 'success fail'
+        $('#userbar').empty()
 
     # Todo: .live is deprecated
     $('tbody tr').live 'click', ->
