@@ -23,7 +23,7 @@ setAuthentication = (authenticated, user) ->
         state = 'success'
         showUser user
     else
-        state ='fail'
+        state = 'fail'
     $('#form-authenticate').addClass state
 
 
@@ -50,8 +50,24 @@ app = Sammy '#main', ->
         $.ajax '/api/v1/authentication',
             beforeSend: (r) =>
                 r.setRequestHeader 'Authorization', makeBasicAuth @params['login'], @params['password']
-            success: (r) ->
+            success: (r) =>
+                # Todo: Store credentials somewhere in the Sammy app
                 setAuthentication r.authentication.authenticated, r.authentication.user
+                @app.refresh()
+            dataType: 'json'
+    @get '/samples', ->
+        $.ajax '/api/v1/samples',
+            beforeSend: (r) =>
+                r.setRequestHeader 'Authorization', makeBasicAuth $('#form-authenticate input[name=login]').val(), $('#form-authenticate input[name=password]').val()
+            success: (r) => @partial '/templates/samples.mustache', samples: r.samples
+            statusCode: 401: => @partial '/templates/401.mustache'
+            dataType: 'json'
+    @get '/samples/:sample', ->
+        $.ajax "/api/v1/samples/#{ @params['sample'] }",
+            beforeSend: (r) =>
+                r.setRequestHeader 'Authorization', makeBasicAuth $('#form-authenticate input[name=login]').val(), $('#form-authenticate input[name=password]').val()
+            success: (r) => @partial '/templates/sample.mustache', sample: r.sample
+            statusCode: 401: => @partial '/templates/401.mustache'
             dataType: 'json'
 
 
@@ -68,5 +84,10 @@ $ ->
 
     # Clear the authentication status when we type
     $('#form-authenticate input').bind 'input',  -> clearAuthentication()
+
+    # Todo: .live is deprecated
+    $('tbody tr').live 'click', ->
+        # Todo: Better to just trigger the a.click event?
+        app.setLocation $(this).find('td a').first().attr('href')
 
     app.run()

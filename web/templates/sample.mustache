@@ -1,0 +1,25 @@
+<p>Sample name: {{sample.name}}</p>
+<p>Added: {{sample.added}}</p>
+<hr>
+<!-- Todo: We cannot upload a file with Ajax -->
+<form id="import_observations" action="/api/v1/data_sources" method="post" enctype="multipart/form-data">
+  <fieldset>
+    <legend>Import observations</legend>
+    <div class="clearfix">
+      <label>Description</label>
+      <div class="input">
+        <input type="text" id="data_source_name">
+      </div>
+    </div>
+    <div class="clearfix">
+      <label>VCF file</label>
+      <div class="input">
+        <input type="file" class="input-file" id="data_source_data">
+      </div>
+    </div>
+    <div class="actions">
+      <button type="submit" class="btn primary">Import observations</button>
+      <button type="reset" class="btn">Cancel</button>
+    </div>
+  </fieldset>
+</form>
