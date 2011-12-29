@@ -17,9 +17,9 @@ makeBasicAuth = (login, password) ->
 
 
 # Set authentication state
-setAuthentication = (authenticated, user) ->
+setAuthentication = (user) ->
     clearAuthentication()
-    if authenticated
+    if user?
         state = 'success'
         showUser user
     else
@@ -38,37 +38,61 @@ showUser = (user) ->
     $('#userbar').empty().append $("<h3>#{ user.name }</h3><p>Roles: #{ user.roles.join ', ' }</p>")
 
 
+# Our Sammy application
 app = Sammy '#main', ->
+
+    # For templates
     @use('Mustache');
+
+    # Authentication state
+    @user = undefined
+    @login = undefined
+    @password = undefined
+
+    # Index
     @get '/', ->
         @$element().html 'Haha, this is the index :)'
+
+    # Status
     @get '/status', ->
         $.ajax '/api/v1/',
             success: (r) => @partial '/templates/status.mustache', status: r.api.status
             dataType: 'json'
+
+    # Authenticate
     @post '/authenticate', ->
+        @app.login = @params['login']
+        @app.password = @params['password']
         $.ajax '/api/v1/authentication',
             beforeSend: (r) =>
-                r.setRequestHeader 'Authorization', makeBasicAuth @params['login'], @params['password']
+                r.setRequestHeader 'Authorization', makeBasicAuth @app.login, @app.password
             success: (r) =>
-                # Todo: Store credentials somewhere in the Sammy app
-                setAuthentication r.authentication.authenticated, r.authentication.user
-                @app.refresh()
+                @app.user = r.authentication.user
+                @app.trigger 'authentication'
             dataType: 'json'
+
+    # List samples
     @get '/samples', ->
         $.ajax '/api/v1/samples',
             beforeSend: (r) =>
-                r.setRequestHeader 'Authorization', makeBasicAuth $('#form-authenticate input[name=login]').val(), $('#form-authenticate input[name=password]').val()
+                r.setRequestHeader 'Authorization', makeBasicAuth @app.login, @app.password
             success: (r) => @partial '/templates/samples.mustache', samples: r.samples
             statusCode: 401: => @partial '/templates/401.mustache'
             dataType: 'json'
+
+    # Show sample
     @get '/samples/:sample', ->
         $.ajax "/api/v1/samples/#{ @params['sample'] }",
             beforeSend: (r) =>
-                r.setRequestHeader 'Authorization', makeBasicAuth $('#form-authenticate input[name=login]').val(), $('#form-authenticate input[name=password]').val()
+                r.setRequestHeader 'Authorization', makeBasicAuth @app.login, @app.password
             success: (r) => @partial '/templates/sample.mustache', sample: r.sample
             statusCode: 401: => @partial '/templates/401.mustache'
             dataType: 'json'
+
+    # Authentication event
+    @bind 'authentication', =>
+        setAuthentication @user
+        @refresh()
 
 
 # On document ready
