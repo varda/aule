@@ -89,6 +89,14 @@ app = Sammy '#main', ->
             type: 'POST'
         return
 
+    # List users
+    @get '/users', ->
+        $.ajax '/api/v1/users',
+            beforeSend: addAuthHeader
+            success: (r) => @partial '/templates/users.mustache', r
+            statusCode: statusHandlers this
+            dataType: 'json'
+
     # Authentication event
     @bind 'authentication', =>
         $('#form-authenticate').removeClass 'success fail'
@@ -96,7 +104,8 @@ app = Sammy '#main', ->
         if @user?
             state = 'success'
             $('#userbar').append $("<h3>#{ @user.name }</h3>
-                                    <p>Roles: #{ @user.roles.join ', ' }</p>")
+                                    <p>Roles: #{ @user.roles.join ', ' }</p>
+                                    <hr>")
         else
             state = 'fail'
         $('#form-authenticate').addClass state
