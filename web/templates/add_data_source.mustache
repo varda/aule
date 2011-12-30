@@ -1,0 +1,32 @@
+<h2>Add data source</h2>
+
+<form action="/data_sources" method="post">
+  <fieldset>
+    <legend>Data source</legend>
+    <div class="clearfix">
+      <label>Name</label>
+      <div class="input">
+        <input type="text" name="name">
+      </div>
+    </div>
+    <div class="clearfix">
+      <label>Filetype</label>
+      <div class="input">
+        <select class="medium" name="filetype">
+          <option>vcf</option>
+          <option>bed</option>
+        </select>
+      </div>
+    </div>
+    <div class="clearfix">
+      <label>Path on server</label>
+      <div class="input">
+        <input type="text" name="local_path">
+      </div>
+    </div>
+    <div class="actions">
+      <button type="submit" class="btn primary">Add data source</button>
+      <button type="reset" class="btn">Cancel</button>
+    </div>
+  </fieldset>
+</form>

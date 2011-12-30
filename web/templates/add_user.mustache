@@ -1,0 +1,36 @@
+<h2>Add user</h2>
+
+<form action="/users" method="post">
+  <fieldset>
+    <legend>User</legend>
+    <div class="clearfix">
+      <label>Name</label>
+      <div class="input">
+        <input type="text" name="name">
+      </div>
+    </div>
+    <div class="clearfix">
+      <label>Login</label>
+      <div class="input">
+        <input type="text" name="login">
+      </div>
+    </div>
+    <div class="clearfix">
+      <label>Password (twice)</label>
+      <div class="input">
+        <input type="password" name="password">
+        <input type="password" name="password_check">
+      </div>
+    </div>
+    <div class="clearfix">
+      <label>Roles</label>
+      <div class="input">
+        <input type="text" name="roles">
+      </div>
+    </div>
+    <div class="actions">
+      <button type="submit" class="btn primary">Add user</button>
+      <button type="reset" class="btn">Cancel</button>
+    </div>
+  </fieldset>
+</form>

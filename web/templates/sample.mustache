@@ -1,6 +1,10 @@
-<p>Sample name: {{sample.name}}</p>
+<h2>Sample</h2>
+
+<p>Name: {{sample.name}}</p>
 <p>Added: {{sample.added}}</p>
+
 <hr>
+
 <!-- Todo: We cannot upload a file with Ajax -->
 <form id="import_observations" action="/api/v1/data_sources" method="post" enctype="multipart/form-data">
   <fieldset>

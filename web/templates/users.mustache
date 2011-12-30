@@ -1,38 +1,13 @@
-<form action="/users" method="post">
-  <fieldset>
-    <legend>Add user</legend>
-    <div class="clearfix">
-      <label>Name</label>
-      <div class="input">
-        <input type="text" name="name">
-      </div>
-    </div>
-    <div class="clearfix">
-      <label>Login</label>
-      <div class="input">
-        <input type="text" name="login">
-      </div>
-    </div>
-    <div class="clearfix">
-      <label>Password (twice)</label>
-      <div class="input">
-        <input type="password" name="password">
-        <input type="password" name="password_check">
-      </div>
-    </div>
-    <div class="actions">
-      <button type="submit" class="btn primary">Add user</button>
-      <button type="reset" class="btn">Cancel</button>
-    </div>
-  </fieldset>
-</form>
+<h2>Users</h2>
+
+<p><a href="/add_user">Add user</a></p>
 
 <table class="zebra-striped">
   <thead><tr><th>Added</th><th>Name</th><th>Roles</th></tr></thead>
   <tbody>
     {{#users}}
     <tr>
-      <td><a href="users/{{id}}">{{added}}</a></td>
+      <td><a href="/users/{{login}}">{{added}}</a></td>
       <td>{{name}}</td>
       <td>{{roles}}</td>
     </tr>

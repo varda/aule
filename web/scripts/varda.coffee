@@ -35,7 +35,10 @@ app = Sammy '#main', ->
     # Common handlers for response status codes
     # Todo: It is unfortunate that we need the context here to call partial...
     statusHandlers = (context) ->
+        400: -> context.log 'Server says bad request'
         401: -> context.partial '/templates/401.mustache'
+        403: -> context.log 'Server says forbidden'
+        404: -> context.log 'Server says not found'
 
     # Index
     @get '/', ->
@@ -75,6 +78,10 @@ app = Sammy '#main', ->
             statusCode: statusHandlers this
             dataType: 'json'
 
+    # Add sample form
+    @get '/add_sample', ->
+        @partial '/templates/add_sample.mustache'
+
     # Add sample
     @post '/samples', ->
         $.ajax '/api/v1/samples',
@@ -97,6 +104,32 @@ app = Sammy '#main', ->
             statusCode: statusHandlers this
             dataType: 'json'
 
+    # Show data source
+    @get '/data_sources/:data_source', ->
+        $.ajax "/api/v1/data_sources/#{ @params['data_source'] }",
+            beforeSend: addAuthHeader
+            success: (r) => @partial '/templates/data_source.mustache', r
+            statusCode: statusHandlers this
+            dataType: 'json'
+
+    # Add data source form
+    @get '/add_data_source', ->
+        @partial '/templates/add_data_source.mustache'
+
+    # Add data source
+    @post '/data_sources', ->
+        $.ajax '/api/v1/data_sources',
+            beforeSend: addAuthHeader
+            data:
+                name: @params['name']
+                filetype: @params['filetype']
+                local_path: @params['local_path']
+            success: (r) => @redirect "/data_sources/#{ r.data_source.id }"
+            statusCode: statusHandlers this
+            dataType: 'json'
+            type: 'POST'
+        return
+
     # List users
     @get '/users', ->
         $.ajax '/api/v1/users',
@@ -104,6 +137,33 @@ app = Sammy '#main', ->
             success: (r) => @partial '/templates/users.mustache', r
             statusCode: statusHandlers this
             dataType: 'json'
+
+    # Show user
+    @get '/users/:user', ->
+        $.ajax "/api/v1/users/#{ @params['user'] }",
+            beforeSend: addAuthHeader
+            success: (r) => @partial '/templates/user.mustache', r
+            statusCode: statusHandlers this
+            dataType: 'json'
+
+    # Add user form
+    @get '/add_user', ->
+        @partial '/templates/add_user.mustache'
+
+    # Add user
+    @post '/users', ->
+        $.ajax '/api/v1/users',
+            beforeSend: addAuthHeader
+            data:
+                name: @params['name']
+                login: @params['login']
+                password: @params['password']
+                roles: @params['roles']
+            success: (r) => @redirect "/users/#{ r.user.login }"
+            statusCode: statusHandlers this
+            dataType: 'json'
+            type: 'POST'
+        return
 
     # Authentication event
     @bind 'authentication', =>

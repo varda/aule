@@ -1,9 +1,13 @@
+<h2>Data sources</h2>
+
+<p><a href="/add_data_source">Add data source</a></p>
+
 <table class="zebra-striped">
   <thead><tr><th>Added</th><th>Name</th><th>Filetype</th></tr></thead>
   <tbody>
     {{#data_sources}}
     <tr>
-      <td><a href="data_sources/{{id}}">{{added}}</a></td>
+      <td><a href="/data_sources/{{id}}">{{added}}</a></td>
       <td>{{name}}</td>
       <td>{{filetype}}</td>
     </tr>
