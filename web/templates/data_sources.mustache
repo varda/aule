@@ -7,7 +7,7 @@
   <tbody>
     {{#data_sources}}
     <tr>
-      <td><a href="/data_sources/{{id}}">{{added}}</a></td>
+      <td><a href="/data_sources/{{#escape}}{{uri}}{{/escape}}">{{added}}</a></td>
       <td>{{name}}</td>
       <td>{{filetype}}</td>
     </tr>

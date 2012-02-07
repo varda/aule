@@ -6,6 +6,12 @@
 # Todo: Some sort of message mechanism (unobtrusive popups at bottom of screen
 #     or something), i.e. to show authentication failures and other messages.
 #
+# Todo: We don't handle resource URIs correctly. We should not deconstruct and
+#     construct them ourselves. The 'problem' is that the URIs to our web
+#     interface are mostly the same as those to the REST API, I don't yet have
+#     an elegant idea for this. In the current form, our interface knows how
+#     URIs are constructed, but it shouldn't.
+#
 # https://github.com/BorisMoore/jsrender
 # https://github.com/sstephenson/eco
 #
@@ -15,6 +21,16 @@
 # Create HTTP Basic Authentication header value
 makeBasicAuth = (login, password) ->
     'Basic ' + $.base64.encode (login + ':' + password)
+
+
+# Add a URL escape function to a structure for use in a Mustache template
+addEscape = (data) ->
+    data.escape = -> (text, render) -> encodeURIComponent render text
+    data
+
+
+## Create expanded API URI
+expand = (uri) -> '/api/v1' + uri
 
 
 # Our Sammy application
@@ -46,7 +62,7 @@ app = Sammy '#main', ->
 
     # Status
     @get '/status', ->
-        $.ajax '/api/v1/',
+        $.ajax (expand '/'),
             success: (r) => @partial '/templates/status.mustache', r.api
             dataType: 'json'
 
@@ -54,7 +70,7 @@ app = Sammy '#main', ->
     @post '/authenticate', ->
         @app.login = @params['login']
         @app.password = @params['password']
-        $.ajax '/api/v1/authentication',
+        $.ajax (expand '/authentication'),
             beforeSend: addAuthHeader
             success: (r) =>
                 @app.user = r.authentication.user
@@ -64,15 +80,15 @@ app = Sammy '#main', ->
 
     # List samples
     @get '/samples', ->
-        $.ajax '/api/v1/samples',
+        $.ajax (expand '/samples'),
             beforeSend: addAuthHeader
-            success: (r) => @partial '/templates/samples.mustache', r
+            success: (r) => @partial '/templates/samples.mustache', addEscape r
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Show sample
     @get '/samples/:sample', ->
-        $.ajax "/api/v1/samples/#{ @params['sample'] }",
+        $.ajax (expand @params['sample']),
             beforeSend: addAuthHeader
             success: (r) => @partial '/templates/sample.mustache', r
             statusCode: statusHandlers this
@@ -84,13 +100,13 @@ app = Sammy '#main', ->
 
     # Add sample
     @post '/samples', ->
-        $.ajax '/api/v1/samples',
+        $.ajax (expand '/samples'),
             beforeSend: addAuthHeader
             data:
                 name: @params['name']
                 coverage_threshold: @params['coverage_threshold']
                 pool_size: @params['pool_size']
-            success: (r) => @redirect "/samples/#{ r.sample.id }"
+            success: (r) => @redirect '/samples/' + encodeURIComponent r.sample
             statusCode: statusHandlers this
             dataType: 'json'
             type: 'POST'
@@ -98,15 +114,15 @@ app = Sammy '#main', ->
 
     # List data sources
     @get '/data_sources', ->
-        $.ajax '/api/v1/data_sources',
+        $.ajax (expand '/data_sources'),
             beforeSend: addAuthHeader
-            success: (r) => @partial '/templates/data_sources.mustache', r
+            success: (r) => @partial '/templates/data_sources.mustache', addEscape r
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Show data source
     @get '/data_sources/:data_source', ->
-        $.ajax "/api/v1/data_sources/#{ @params['data_source'] }",
+        $.ajax (expand @params['data_source']),
             beforeSend: addAuthHeader
             success: (r) => @partial '/templates/data_source.mustache', r
             statusCode: statusHandlers this
@@ -118,13 +134,13 @@ app = Sammy '#main', ->
 
     # Add data source
     @post '/data_sources', ->
-        $.ajax '/api/v1/data_sources',
+        $.ajax (expand '/data_sources'),
             beforeSend: addAuthHeader
             data:
                 name: @params['name']
                 filetype: @params['filetype']
                 local_path: @params['local_path']
-            success: (r) => @redirect "/data_sources/#{ r.data_source.id }"
+            success: (r) => @redirect '/data_sources/' + encodeURIComponent r.data_source
             statusCode: statusHandlers this
             dataType: 'json'
             type: 'POST'
@@ -132,15 +148,15 @@ app = Sammy '#main', ->
 
     # List users
     @get '/users', ->
-        $.ajax '/api/v1/users',
+        $.ajax (expand '/users'),
             beforeSend: addAuthHeader
-            success: (r) => @partial '/templates/users.mustache', r
+            success: (r) => @partial '/templates/users.mustache', addEscape r
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Show user
     @get '/users/:user', ->
-        $.ajax "/api/v1/users/#{ @params['user'] }",
+        $.ajax (expand @params['user']),
             beforeSend: addAuthHeader
             success: (r) => @partial '/templates/user.mustache', r
             statusCode: statusHandlers this
@@ -152,14 +168,14 @@ app = Sammy '#main', ->
 
     # Add user
     @post '/users', ->
-        $.ajax '/api/v1/users',
+        $.ajax (expand '/users'),
             beforeSend: addAuthHeader
             data:
                 name: @params['name']
                 login: @params['login']
                 password: @params['password']
                 roles: @params['roles']
-            success: (r) => @redirect "/users/#{ r.user.login }"
+            success: (r) => @redirect '/users/' + encodeURIComponent r.user
             statusCode: statusHandlers this
             dataType: 'json'
             type: 'POST'

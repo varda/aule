@@ -3,11 +3,12 @@
 <p><a href="/add_user">Add user</a></p>
 
 <table class="zebra-striped">
-  <thead><tr><th>Added</th><th>Name</th><th>Roles</th></tr></thead>
+  <thead><tr><th>Added</th><th>Login</th><th>Name</th><th>Roles</th></tr></thead>
   <tbody>
     {{#users}}
     <tr>
-      <td><a href="/users/{{login}}">{{added}}</a></td>
+      <td><a href="/users/{{#escape}}{{uri}}{{/escape}}">{{added}}</a></td>
+      <td>{{login}}</td>
       <td>{{name}}</td>
       <td>{{roles}}</td>
     </tr>

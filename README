@@ -36,3 +36,11 @@ Example nginx configuration:
         }
 
     }
+
+
+Todo
+----
+
+* Bootstrap 2.0
+* Nice querying interfaces
+* Pagination

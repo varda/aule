@@ -7,7 +7,7 @@
   <tbody>
     {{#samples}}
     <tr>
-      <td><a href="/samples/{{id}}">{{added}}</a></td>
+      <td><a href="/samples/{{#escape}}{{uri}}{{/escape}}">{{added}}</a></td>
       <td>{{name}}</td>
     </tr>
     {{/samples}}
