@@ -29,7 +29,7 @@ Example nginx configuration:
         server_name celly;
         location / {
             root /home/martijn/projects/varda-web/web;
-            try_files $uri /index.html;
+            try_files $uri /varda.html;
         }
         location /api/v1/ {
             proxy_pass http://varda_server/;
