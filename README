@@ -1,15 +1,46 @@
-Varda web client
-================
+Varda web
+=========
 
-The web admin is a client-side JavaScript-driven interface for the Varda REST
-server. The HTML5 layout is based on Twitter Bootstrap and uses Less
-stylesheets. The interface is implemented in CoffeeScript using the Sammy
-jQuery-based framework and ICanHaz.js for Moustache templates.
+A web interface to Varda server, a database for genomic variants.
+
+**This is a work in progress, not ready for use!**
+
+
+Description
+-----------
+
+Varda is an application for storing genomic variation data obtained from next-
+generation sequencing experiments, such as full-genome or exome sequencing of
+individuals or populations. Variants can be imported from standard formats
+such as [VCF](http://www.1000genomes.org/wiki/Analysis/Variant%20Call%20Format/vcf-variant-call-format-version-41)
+files, or annotated for presence in previously imported datasets.
+
+Varda is implemented by very loosely coupled components, communicating using
+a RESTful protocol over HTTP with json-encoded response payloads.
+
+* *Varda server:* Exposes a RESTful API for managing and querying the variant
+    database.
+* *Varda client:* Command line client for querying the server
+    non-interactively.
+* *Varda web:* Web interface for browsing the server interactively.
+
+This is Varda web.
+
+
+Varda web
+---------
+
+The web interface is a client-side JavaScript-driven interface to the Varda
+REST server. The HTML5 layout is based on Twitter's [Bootstrap](http://twitter.github.com/bootstrap/)
+and uses [Less](http://lesscss.org/) stylesheets. The interface is implemented
+in [Coffeescript](http://coffeescript.org/) using the [Sammy.js](http://sammyjs.org/)
+framework.
 
 At the moment, both the Less stylesheets and the CoffeeScript files are
 compiled dynamically in the browser to CSS and JavaScript, respectively. In
-the future, we could pre-compile them. Same goes for the Mustache templates,
-we could use Hogan.js for compiled templates.
+the future, we could pre-compile them. Same goes for the [Mustache](http://mustache.github.com/)
+templates, we could for example use [Hogan.js](http://twitter.github.com/hogan.js/)
+for compiled templates.
 
 
 Webserver configuration
@@ -44,3 +75,19 @@ Todo
 * Bootstrap 2.0
 * Nice querying interfaces
 * Pagination
+
+
+Documentation
+-------------
+
+Todo (surprise, surprise).
+
+
+Copyright and license
+---------------------
+
+* Copyright (c) 2011-2012, Leiden University Medical Center <humgen@lumc.nl>
+* Copyright (c) 2011-2012, Martijn Vermaat <martijn@vermaat.name>
+
+Licensed under the [MIT license](http://en.wikipedia.org/wiki/MIT_License),
+see the LICENSE file.

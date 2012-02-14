@@ -1,4 +1,4 @@
-# Varda web client
+# Varda web
 #
 # For templating, we currently use Moustache templates via Sammy, but if we
 # need more logic we might switch to something like JsRender or eco.
@@ -6,16 +6,13 @@
 # Todo: Some sort of message mechanism (unobtrusive popups at bottom of screen
 #     or something), i.e. to show authentication failures and other messages.
 #
-# Todo: We don't handle resource URIs correctly. We should not deconstruct and
-#     construct them ourselves. The 'problem' is that the URIs to our web
-#     interface are mostly the same as those to the REST API, I don't yet have
-#     an elegant idea for this. In the current form, our interface knows how
-#     URIs are constructed, but it shouldn't.
-#
 # https://github.com/BorisMoore/jsrender
 # https://github.com/sstephenson/eco
 #
-# 2011, Martijn Vermaat <m.vermaat.hg@lumc.nl>
+# Copyright (c) 2011-2012, Leiden University Medical Center <humgen@lumc.nl>
+# Copyright (C) 2011-2012, Martijn Vermaat <m.vermaat.hg@lumc.nl>
+#
+# Licensed under the MIT license, see the LICENSE file.
 
 
 # Create HTTP Basic Authentication header value
