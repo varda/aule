@@ -27,7 +27,7 @@ addEscape = (data) ->
 
 
 ## Create expanded API URI
-expand = (uri) -> '/api/v1' + uri
+expand = (uri) -> '/api' + uri
 
 
 # Our Sammy application
