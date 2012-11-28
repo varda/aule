@@ -15,6 +15,14 @@
 # Licensed under the MIT license, see the LICENSE file.
 
 
+# Prefix for resources such as templates
+RESOURCES_PREFIX = '/varda-web'
+
+
+# Prefix for API call URIs
+API_PREFIX = ''
+
+
 # Create HTTP Basic Authentication header value
 makeBasicAuth = (login, password) ->
     'Basic ' + $.base64.encode (login + ':' + password)
@@ -26,8 +34,8 @@ addEscape = (data) ->
     data
 
 
-## Create expanded API URI
-expand = (uri) -> '/api' + uri
+# Create expanded API URI
+expand = (uri) -> API_PREFIX + uri
 
 
 # Our Sammy application
@@ -49,7 +57,7 @@ app = Sammy '#main', ->
     # Todo: It is unfortunate that we need the context here to call partial...
     statusHandlers = (context) ->
         400: -> context.log 'Server says bad request'
-        401: -> context.partial '/templates/401.mustache'
+        401: -> context.partial RESOURCES_PREFIX + '/templates/401.mustache'
         403: -> context.log 'Server says forbidden'
         404: -> context.log 'Server says not found'
 
@@ -60,7 +68,7 @@ app = Sammy '#main', ->
     # Status
     @get '/status', ->
         $.ajax (expand '/'),
-            success: (r) => @partial '/templates/status.mustache', r.api
+            success: (r) => @partial RESOURCES_PREFIX + '/templates/status.mustache', r.api
             dataType: 'json'
 
     # Authenticate
@@ -79,7 +87,7 @@ app = Sammy '#main', ->
     @get '/samples', ->
         $.ajax (expand '/samples'),
             beforeSend: addAuthHeader
-            success: (r) => @partial '/templates/samples.mustache', addEscape r
+            success: (r) => @partial RESOURCES_PREFIX + '/templates/samples.mustache', addEscape r
             statusCode: statusHandlers this
             dataType: 'json'
 
@@ -87,13 +95,13 @@ app = Sammy '#main', ->
     @get '/samples/:sample', ->
         $.ajax (expand @params['sample']),
             beforeSend: addAuthHeader
-            success: (r) => @partial '/templates/sample.mustache', r
+            success: (r) => @partial RESOURCES_PREFIX + '/templates/sample.mustache', r
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Add sample form
     @get '/add_sample', ->
-        @partial '/templates/add_sample.mustache'
+        @partial RESOURCES_PREFIX + '/templates/add_sample.mustache'
 
     # Add sample
     @post '/samples', ->
@@ -113,7 +121,7 @@ app = Sammy '#main', ->
     @get '/data_sources', ->
         $.ajax (expand '/data_sources'),
             beforeSend: addAuthHeader
-            success: (r) => @partial '/templates/data_sources.mustache', addEscape r
+            success: (r) => @partial RESOURCES_PREFIX + '/templates/data_sources.mustache', addEscape r
             statusCode: statusHandlers this
             dataType: 'json'
 
@@ -121,13 +129,13 @@ app = Sammy '#main', ->
     @get '/data_sources/:data_source', ->
         $.ajax (expand @params['data_source']),
             beforeSend: addAuthHeader
-            success: (r) => @partial '/templates/data_source.mustache', r
+            success: (r) => @partial RESOURCES_PREFIX + '/templates/data_source.mustache', r
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Add data source form
     @get '/add_data_source', ->
-        @partial '/templates/add_data_source.mustache'
+        @partial RESOURCES_PREFIX + '/templates/add_data_source.mustache'
 
     # Add data source
     @post '/data_sources', ->
@@ -147,7 +155,7 @@ app = Sammy '#main', ->
     @get '/users', ->
         $.ajax (expand '/users'),
             beforeSend: addAuthHeader
-            success: (r) => @partial '/templates/users.mustache', addEscape r
+            success: (r) => @partial RESOURCES_PREFIX + '/templates/users.mustache', addEscape r
             statusCode: statusHandlers this
             dataType: 'json'
 
@@ -155,13 +163,13 @@ app = Sammy '#main', ->
     @get '/users/:user', ->
         $.ajax (expand @params['user']),
             beforeSend: addAuthHeader
-            success: (r) => @partial '/templates/user.mustache', r
+            success: (r) => @partial RESOURCES_PREFIX + '/templates/user.mustache', r
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Add user form
     @get '/add_user', ->
-        @partial '/templates/add_user.mustache'
+        @partial RESOURCES_PREFIX + '/templates/add_user.mustache'
 
     # Add user
     @post '/users', ->
