@@ -12,9 +12,9 @@
     <![endif]-->
 
     <!-- Le styles -->
-    <link rel="stylesheet/less" href="/varda-web/bootstrap/bootstrap.less" media="all" />
+    <link rel="stylesheet/less" href="/varda-web/bootstrap/less/bootstrap.less" media="all" />
     <link rel="stylesheet/less" href="/varda-web/stylesheets/varda.less" media="all" />
-    <script src="/varda-web/scripts/less-1.1.5.min.js"></script>
+    <script src="/varda-web/scripts/less-1.3.1.min.js"></script>
 
     <script src="/varda-web/scripts/jquery-1.7.1.min.js"></script>
     <script src="/varda-web/scripts/jquery.base64.min.js"></script>
@@ -34,8 +34,8 @@
   </head>
   <body>
 
-    <div class="topbar">
-      <div class="fill">
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
         <div class="container">
           <a class="brand" href="/varda-web">Varda</a>
           <ul class="nav">
@@ -43,7 +43,7 @@
             <li><a href="/varda-web/about">About</a></li>
             <li><a href="/varda-web/contact">Contact</a></li>
           </ul>
-          <form class="pull-right" action="/varda-web/authenticate" method="post" id="form-authenticate">
+          <form class="navbar-form pull-right" action="/varda-web/authenticate" method="post" id="form-authenticate">
             <input class="input-small" type="text" placeholder="Login" name="login">
             <input class="input-small" type="password" placeholder="Password" name="password">
             <button class="btn" type="submit">Authenticate</button>
@@ -60,7 +60,7 @@
         </div>
         <div class="row">
           <div class="span10" id="main"></div>
-          <div class="span4" id="sidebar">
+          <div class="span2" id="sidebar">
             <div id="userbar"></div>
             <p><a href="/varda-web/status">Status</a></p>
             <p><a href="/varda-web/samples">Samples</a></p>
