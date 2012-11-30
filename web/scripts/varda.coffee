@@ -42,7 +42,7 @@ expand = (uri) -> API_PREFIX + uri
 app = Sammy '#main', ->
 
     # For templates
-    @use('Mustache');
+    @use Sammy.Mustache
 
     # Authentication state
     @user = undefined
