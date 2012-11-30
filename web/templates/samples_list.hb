@@ -1,16 +1,15 @@
-{{#samples.length}}
+{{#if samples}}
   <table class="table table-hover">
     <thead><tr><th>Added</th><th>Name</th></tr></thead>
     <tbody>
-      {{#samples}}
-      <tr data-href="/varda-web/samples/{{#escape}}{{uri}}{{/escape}}">
+      {{#each samples}}
+      <tr data-href="/varda-web/samples/{{escape uri}}">
         <td>{{added}}</td>
         <td>{{name}}</td>
       </tr>
-      {{/samples}}
+      {{/each}}
     </tbody>
   </table>
-{{/samples.length}}
-{{^samples.length}}
+{{else}}
   <p>No samples are here.</p>
-{{/samples.length}}
+{{/if}}

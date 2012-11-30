@@ -28,12 +28,6 @@ makeBasicAuth = (login, password) ->
     'Basic ' + $.base64.encode (login + ':' + password)
 
 
-# Add a URL escape function to a structure for use in a Mustache template
-addEscape = (data) ->
-    data.escape = -> (text, render) -> encodeURIComponent render text
-    data
-
-
 # Create expanded API URI
 expand = (uri) -> API_PREFIX + uri
 
@@ -42,7 +36,12 @@ expand = (uri) -> API_PREFIX + uri
 app = Sammy '#main', ->
 
     # For templates
-    @use Sammy.Mustache
+    @use Sammy.Handlebars, 'hb'
+
+    Handlebars.registerHelper 'escape', (value) -> encodeURIComponent value
+
+    @helper 'template', (template) -> RESOURCES_PREFIX + '/templates/' + template + '.hb'
+    @helper 'show', (template, data, page) -> @partial (@template template), data, page: (@template page)
 
     # Authentication state
     @user = undefined
@@ -68,7 +67,7 @@ app = Sammy '#main', ->
     # Status
     @get '/status', ->
         $.ajax (expand '/'),
-            success: (r) => @partial RESOURCES_PREFIX + '/templates/status.mustache', r.api
+            success: (r) => @show 'status', r.api
             dataType: 'json'
 
     # Authenticate
@@ -87,7 +86,7 @@ app = Sammy '#main', ->
     @get '/samples', ->
         $.ajax (expand '/samples'),
             beforeSend: addAuthHeader
-            success: (r) => @partial RESOURCES_PREFIX + '/templates/samples.mustache', (addEscape r), page: RESOURCES_PREFIX + '/templates/samples_list.mustache'
+            success: (r) => @show 'samples', r, 'samples_list'
             statusCode: statusHandlers this
             dataType: 'json'
 
@@ -95,7 +94,7 @@ app = Sammy '#main', ->
     @get '/mysamples', ->
         $.ajax (expand '/users/martijn/samples'),
             beforeSend: addAuthHeader
-            success: (r) => @partial RESOURCES_PREFIX + '/templates/samples.mustache', (addEscape r), page: RESOURCES_PREFIX + '/templates/samples_list.mustache'
+            success: (r) => @show 'samples', r, 'samples_list'
             statusCode: statusHandlers this
             dataType: 'json'
 
@@ -103,13 +102,12 @@ app = Sammy '#main', ->
     @get '/samples/:sample', ->
         $.ajax (expand @params['sample']),
             beforeSend: addAuthHeader
-            success: (r) => @partial RESOURCES_PREFIX + '/templates/sample.mustache', r
+            success: (r) => @show 'sample', r
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Add sample form
-    @get '/add_sample', ->
-        @partial RESOURCES_PREFIX + '/templates/samples.mustache', {}, page: RESOURCES_PREFIX + '/templates/samples_add.mustache'
+    @get '/add_sample', -> @show 'samples', {}, 'samples_add'
 
     # Add sample
     @post '/samples', ->
@@ -129,7 +127,7 @@ app = Sammy '#main', ->
     @get '/data_sources', ->
         $.ajax (expand '/data_sources'),
             beforeSend: addAuthHeader
-            success: (r) => @partial RESOURCES_PREFIX + '/templates/data_sources.mustache', addEscape r
+            success: (r) => @partial RESOURCES_PREFIX + '/templates/data_sources.mustache', r
             statusCode: statusHandlers this
             dataType: 'json'
 
@@ -163,7 +161,7 @@ app = Sammy '#main', ->
     @get '/users', ->
         $.ajax (expand '/users'),
             beforeSend: addAuthHeader
-            success: (r) => @partial RESOURCES_PREFIX + '/templates/users.mustache', addEscape r
+            success: (r) => @partial RESOURCES_PREFIX + '/templates/users.mustache', r
             statusCode: statusHandlers this
             dataType: 'json'
 
@@ -201,7 +199,7 @@ app = Sammy '#main', ->
         if @user?
             state = 'success'
             $('#nav').prepend $("<li class='nav-header user'>#{ @user.name }</hli>
-                                 <li><a href='#'>Profile</a></li>")
+                                 <li class='user'><a href='#'>Profile</a></li>")
         else
             state = 'fail'
         $('#form-authenticate').addClass state
