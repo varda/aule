@@ -87,7 +87,15 @@ app = Sammy '#main', ->
     @get '/samples', ->
         $.ajax (expand '/samples'),
             beforeSend: addAuthHeader
-            success: (r) => @partial RESOURCES_PREFIX + '/templates/samples.mustache', addEscape r
+            success: (r) => @partial RESOURCES_PREFIX + '/templates/samples.mustache', (addEscape r), page: RESOURCES_PREFIX + '/templates/samples_list.mustache'
+            statusCode: statusHandlers this
+            dataType: 'json'
+
+    # List samples for current user
+    @get '/mysamples', ->
+        $.ajax (expand '/users/martijn/samples'),
+            beforeSend: addAuthHeader
+            success: (r) => @partial RESOURCES_PREFIX + '/templates/samples.mustache', (addEscape r), page: RESOURCES_PREFIX + '/templates/samples_list.mustache'
             statusCode: statusHandlers this
             dataType: 'json'
 
@@ -101,7 +109,7 @@ app = Sammy '#main', ->
 
     # Add sample form
     @get '/add_sample', ->
-        @partial RESOURCES_PREFIX + '/templates/add_sample.mustache'
+        @partial RESOURCES_PREFIX + '/templates/samples.mustache', {}, page: RESOURCES_PREFIX + '/templates/samples_add.mustache'
 
     # Add sample
     @post '/samples', ->

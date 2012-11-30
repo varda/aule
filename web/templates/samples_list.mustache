@@ -1,0 +1,16 @@
+{{#samples.length}}
+  <table class="table table-hover">
+    <thead><tr><th>Added</th><th>Name</th></tr></thead>
+    <tbody>
+      {{#samples}}
+      <tr data-href="/varda-web/samples/{{#escape}}{{uri}}{{/escape}}">
+        <td>{{added}}</td>
+        <td>{{name}}</td>
+      </tr>
+      {{/samples}}
+    </tbody>
+  </table>
+{{/samples.length}}
+{{^samples.length}}
+  <p>No samples are here.</p>
+{{/samples.length}}
