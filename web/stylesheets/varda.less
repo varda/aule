@@ -1,11 +1,26 @@
+@green: #00A301;
+@red: #E51400;
+
+@textGray: #080808;
+
+@inputSuccess: lighten(@green, 5%);
+@inputSuccessHighlight: darken(@green, 5%);
+@inputFail: lighten(@red, 5%);
+@inputFailHighlight: darken(@red, 5%);
+
 body {
-  padding-top: 40px;
+  padding-top: 60px;
+}
+
+tbody tr[data-href] {
+    cursor: pointer;
 }
 
 #form-authenticate.success input {
-    background: #5C7B1E; // YellowGreen shade
+    background: @inputSuccess;
+    color: white;
     &:hover {
-        background: #8BB82D; // YellowGreen shade
+        background: @inputSuccessHighlight;
     }
     &:focus,
     &.focus {
@@ -15,9 +30,10 @@ body {
 }
 
 #form-authenticate.fail input {
-    background: #8E1B1B; // FireBrick shade
+    background: @inputFail;
+    color: white;
     &:hover {
-        background: #BA3838; // FireBrick shade
+        background: @inputFailHighlight;
     }
     &:focus,
     &.focus {

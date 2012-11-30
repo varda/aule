@@ -1,28 +1,31 @@
-<h2>Sample</h2>
+<h2>Sample: {{sample.name}}</h2>
 
-<p>Name: {{sample.name}}</p>
-<p>Added: {{sample.added}}</p>
+<ul class="nav nav-pills">
+  <li class="active"><a href="/varda-web/samples">Info</a></li>
+  <li><a href="/varda-web/samples">Edit sample</a></li>
+  <li><a href="/varda-web/add_sample">Import observations</a></li>
+</ul>
+
+<dl>
+  <dt>Name</dt>
+  <dd>{{sample.name}}</dd>
+  <dt>Added</dd>
+  <dd>{{sample.added}}</dd>
+</dl>
 
 <hr>
+
+<h2>Import observations</h2>
 
 <!-- Todo: We cannot upload a file with Ajax -->
 <form id="import_observations" action="/api/v1/data_sources" method="post" enctype="multipart/form-data">
   <fieldset>
-    <legend>Import observations</legend>
-    <div class="clearfix">
-      <label>Description</label>
-      <div class="input">
-        <input type="text" id="data_source_name">
-      </div>
-    </div>
-    <div class="clearfix">
-      <label>VCF file</label>
-      <div class="input">
-        <input type="file" class="input-file" id="data_source_data">
-      </div>
-    </div>
-    <div class="actions">
-      <button type="submit" class="btn primary">Import observations</button>
+    <label>Description</label>
+    <input type="text" id="data_source_name">
+    <label>VCF file</label>
+    <input type="file" class="input-file" id="data_source_data">
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Import observations</button>
       <button type="reset" class="btn">Cancel</button>
     </div>
   </fieldset>

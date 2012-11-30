@@ -1,28 +1,22 @@
-<h2>Add sample</h2>
+<h2>Samples</h2>
 
-<form action="/samples" method="post">
+<ul class="nav nav-pills">
+  <li><a href="/varda-web/samples">My samples</a></li>
+  <li><a href="/varda-web/samples">All samples</a></li>
+  <li class="active"><a href="/varda-web/add_sample">Add sample</a></li>
+</ul>
+
+
+<form action="/varda-web/samples" method="post">
   <fieldset>
-    <legend>Sample</legend>
-    <div class="clearfix">
-      <label>Name</label>
-      <div class="input">
-        <input type="text" name="name">
-      </div>
-    </div>
-    <div class="clearfix">
-      <label>Coverage threshold</label>
-      <div class="input">
-        <input type="text" class="mini" name="coverage_threshold">
-      </div>
-    </div>
-    <div class="clearfix">
-      <label>Pool size</label>
-      <div class="input">
-        <input type="text" class="mini" name="pool_size">
-      </div>
-    </div>
-    <div class="actions">
-      <button type="submit" class="btn primary">Add sample</button>
+    <label for="name">Name</label>
+    <input type="text" name="name" id="name">
+    <label for="coverage_threshold">Coverage threshold</label>
+    <input type="text" class="mini" name="coverage_threshold" id="coverage_threshold">
+    <label for="pool_size">Pool size</label>
+    <input type="text" class="mini" name="pool_size" id="pool_size">
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Add sample</button>
       <button type="reset" class="btn">Cancel</button>
     </div>
   </fieldset>

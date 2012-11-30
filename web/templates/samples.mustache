@@ -1,13 +1,17 @@
 <h2>Samples</h2>
 
-<p><a href="/add_sample">Add sample</a></p>
+<ul class="nav nav-pills">
+  <li class="active"><a href="/varda-web/samples">My samples</a></li>
+  <li><a href="/varda-web/samples">All samples</a></li>
+  <li><a href="/varda-web/add_sample">Add sample</a></li>
+</ul>
 
-<table class="zebra-striped">
+<table class="table table-hover">
   <thead><tr><th>Added</th><th>Name</th></tr></thead>
   <tbody>
     {{#samples}}
-    <tr>
-      <td><a href="/samples/{{#escape}}{{uri}}{{/escape}}">{{added}}</a></td>
+    <tr data-href="/varda-web/samples/{{#escape}}{{uri}}{{/escape}}">
+      <td>{{added}}</td>
       <td>{{name}}</td>
     </tr>
     {{/samples}}

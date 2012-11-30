@@ -63,7 +63,7 @@ app = Sammy '#main', ->
 
     # Index
     @get '/', ->
-        @$element().html 'Haha, this is the index :)'
+        @$element().html '<h2>Welcome</h2><p>Haha, this is the index :)</p>'
 
     # Status
     @get '/status', ->
@@ -189,12 +189,11 @@ app = Sammy '#main', ->
     # Authentication event
     @bind 'authentication', =>
         $('#form-authenticate').removeClass 'success fail'
-        $('#userbar').empty()
+        $('#nav user').remove()
         if @user?
             state = 'success'
-            $('#userbar').append $("<h3>#{ @user.name }</h3>
-                                    <p>Roles: #{ @user.roles.join ', ' }</p>
-                                    <hr>")
+            $('#nav').prepend $("<li class='nav-header user'>#{ @user.name }</hli>
+                                 <li><a href='#'>Profile</a></li>")
         else
             state = 'fail'
         $('#form-authenticate').addClass state
@@ -215,12 +214,12 @@ $ ->
     # Clear the authentication status when we type
     $('#form-authenticate input').bind 'input', ->
         $('#form-authenticate').removeClass 'success fail'
-        $('#userbar').empty()
+        $('#nav user').remove()
 
     # Todo: .live is deprecated
-    $('tbody tr').live 'click', (e) ->
+    $('tbody tr[data-href]').live 'click', (e) ->
         e.preventDefault()
         # Todo: Better to just trigger the a.click event?
-        app.setLocation $(this).find('td a').first().attr('href')
+        app.setLocation $(this).data('href')
 
     app.run()

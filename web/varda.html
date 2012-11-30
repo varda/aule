@@ -39,41 +39,38 @@
         <div class="container">
           <a class="brand" href="/varda-web">Varda</a>
           <ul class="nav">
-            <li class="active"><a href="/varda-web">Home</a></li>
+            <li><a href="/varda-web">Home</a></li>
             <li><a href="/varda-web/about">About</a></li>
             <li><a href="/varda-web/contact">Contact</a></li>
           </ul>
           <form class="navbar-form pull-right" action="/varda-web/authenticate" method="post" id="form-authenticate">
             <input class="input-small" type="text" placeholder="Login" name="login">
             <input class="input-small" type="password" placeholder="Password" name="password">
-            <button class="btn" type="submit">Authenticate</button>
+            <button class="btn btn-primary" type="submit">Authenticate</button>
           </form>
         </div>
       </div>
     </div>
 
     <div class="container">
-
-      <div class="content">
-        <div class="page-header" id="header">
-          <h1>Varda <small>next-generation sequencing variant database</small></h1>
-        </div>
-        <div class="row">
-          <div class="span10" id="main"></div>
-          <div class="span2" id="sidebar">
-            <div id="userbar"></div>
-            <p><a href="/varda-web/status">Status</a></p>
-            <p><a href="/varda-web/samples">Samples</a></p>
-            <p><a href="/varda-web/data_sources">Data sources</a></p>
-            <p><a href="/varda-web/users">Users</a></p>
-          </div>
+      <div class="page-header" id="header">
+        <h1>Varda <small>next-generation sequencing variant database</small></h1>
+      </div>
+      <div class="row">
+        <div class="span9" id="main"></div>
+        <div class="span3" id="sidebar">
+          <ul class="nav nav-list" id="nav">
+            <li class="nav-header">Resources</li>
+            <li><a href="/varda-web/status">Status</a></li>
+            <li><a href="/varda-web/samples">Samples</a></li>
+            <li><a href="/varda-web/data_sources">Data sources</a></li>
+            <li><a href="/varda-web/users">Users</a></li>
+          </ul>
         </div>
       </div>
-
       <footer>
-        <p>&copy; Leiden University Medical Center 2011</p>
+        <p>&copy; Leiden University Medical Center 2012</p>
       </footer>
-
     </div> <!-- /container -->
 
   </body>
