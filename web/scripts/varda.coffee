@@ -189,7 +189,7 @@ app = Sammy '#main', ->
     # Authentication event
     @bind 'authentication', =>
         $('#form-authenticate').removeClass 'success fail'
-        $('#nav user').remove()
+        $('#nav .user').remove()
         if @user?
             state = 'success'
             $('#nav').prepend $("<li class='nav-header user'>#{ @user.name }</hli>
@@ -214,7 +214,7 @@ $ ->
     # Clear the authentication status when we type
     $('#form-authenticate input').bind 'input', ->
         $('#form-authenticate').removeClass 'success fail'
-        $('#nav user').remove()
+        $('#nav .user').remove()
 
     # Todo: .live is deprecated
     $('tbody tr[data-href]').live 'click', (e) ->
