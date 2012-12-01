@@ -19,17 +19,13 @@
 RESOURCES_PREFIX = '/varda-web'
 
 
-# Prefix for API call URIs
-API_PREFIX = ''
+# Root endpoint of Varda server
+API_ROOT = '/'
 
 
 # Create HTTP Basic Authentication header value
 makeBasicAuth = (login, password) ->
     'Basic ' + $.base64.encode (login + ':' + password)
-
-
-# Create expanded API URI
-expand = (uri) -> API_PREFIX + uri
 
 
 # Our Sammy application
@@ -40,13 +36,31 @@ app = Sammy '#main', ->
 
     Handlebars.registerHelper 'escape', (value) -> encodeURIComponent value
 
-    @helper 'template', (template) -> RESOURCES_PREFIX + '/templates/' + template + '.hb'
-    @helper 'show', (template, data, page) -> @partial (@template template), data, page: (@template page)
+    @helper 'template', (template) ->
+        RESOURCES_PREFIX + '/templates/' + template + '.hb'
+    @helper 'show', (template, data, page) ->
+        @partial (@template template), data, page: (@template page)
 
     # Authentication state
     @user = undefined
     @login = undefined
     @password = undefined
+
+    @helper 'resolveUri', (key, fn) ->
+        resolver =
+            samples:
+                uri: API_ROOT, get: (r) -> r.api.collections.samples
+            users:
+                uri: API_ROOT, get: (r) -> r.api.collections.users
+        $.ajax resolver[key].uri,
+            success: (r) => fn (resolver[key].get r)
+            dataType: 'json'
+
+    @helper 'uri', do ->
+        cache = {}
+        (key, fn) ->
+            if uri = cache[key] then uri
+            else @resolveUri key, (uri) -> fn (cache[key] = uri)
 
     # Add HTTP Basic Authentication header to request
     addAuthHeader = (r) =>
@@ -66,7 +80,7 @@ app = Sammy '#main', ->
 
     # Status
     @get '/status', ->
-        $.ajax (expand '/'),
+        $.ajax API_ROOT,
             success: (r) => @show 'status', r.api
             dataType: 'json'
 
@@ -79,16 +93,17 @@ app = Sammy '#main', ->
             success: (r) =>
                 @app.user = r.authentication.user
                 @app.trigger 'authentication'
-            dataType: 'json'
+                dataType: 'json'
         return
 
     # List samples
     @get '/samples', ->
-        $.ajax (expand '/samples'),
-            beforeSend: addAuthHeader
-            success: (r) => @show 'samples', r, 'samples_list'
-            statusCode: statusHandlers this
-            dataType: 'json'
+        @uri 'samples', (uri) =>
+            $.ajax uri,
+                beforeSend: addAuthHeader
+                success: (r) => @show 'samples', r, 'samples_list'
+                statusCode: statusHandlers this
+                dataType: 'json'
 
     # List samples for current user
     @get '/mysamples', ->
