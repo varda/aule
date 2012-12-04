@@ -47,25 +47,8 @@ app = Sammy '#main', ->
     @login = undefined
     @password = undefined
 
-    @helper 'resolveUri', (key, fn) ->
-        resolver =
-            authentication:
-                uri: API_ROOT, get: (r) -> r.api.authentication
-            samples:
-                uri: API_ROOT, get: (r) -> r.api.collections.samples
-            data_sources:
-                uri: API_ROOT, get: (r) -> r.api.collections.data_sources
-            users:
-                uri: API_ROOT, get: (r) -> r.api.collections.users
-        $.ajax resolver[key].uri,
-            success: (r) => fn (resolver[key].get r)
-            dataType: 'json'
-
-    @helper 'uri', do ->
-        cache = {}
-        (key, fn) ->
-            if uri = cache[key] then uri
-            else @resolveUri key, (uri) -> fn (cache[key] = uri)
+    # API resource URIs will be in here
+    @uris = {}
 
     # Add HTTP Basic Authentication header to request
     addAuthHeader = (r) =>
@@ -99,17 +82,24 @@ app = Sammy '#main', ->
                 success: (r) =>
                     @app.user = r.authentication.user
                     @app.trigger 'authentication'
-                    dataType: 'json'
+                dataType: 'json'
         return
 
     # List samples
     @get '/samples', ->
-        @uri 'samples', (uri) =>
-            $.ajax uri,
-                beforeSend: addAuthHeader
-                success: (r) => @show 'Samples', 'samples', r, 'samples_list'
-                statusCode: statusHandlers this
-                dataType: 'json'
+        console.log "hierzo: #{ @app.uri_samples }"
+        $.ajax @app.uri_samples,
+            beforeSend: addAuthHeader
+            success: (r) => @show 'Samples', 'samples', r, 'samples_list'
+            statusCode: statusHandlers this
+            dataType: 'json'
+
+#        @uri 'samples', (uri) =>
+#            $.ajax uri,
+#                beforeSend: addAuthHeader
+#                success: (r) => @show 'Samples', 'samples', r, 'samples_list'
+#                statusCode: statusHandlers this
+#                dataType: 'json'
 
     # List samples for current user
     @get '/my_samples', ->
@@ -250,4 +240,10 @@ $ ->
         # Todo: Better to just trigger the a.click event?
         app.setLocation $(this).data('href')
 
-    app.run()
+    # Get resource URIs and run app
+    $.ajax API_ROOT,
+        success: (r) =>
+            app.uris =_samples = r.api.collections.samples
+            console.log "zozo: #{ app.uri_samples }"
+            app.run()
+        dataType: 'json'
