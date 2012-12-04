@@ -1,3 +1,1 @@
-<h2>Status</h2>
-
-<p>The server is {{status}}.</p>
+<p>The server is <strong>{{api.status}}</strong> (API version {{api.version}}).</p>

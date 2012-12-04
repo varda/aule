@@ -1,3 +1,1 @@
-<h2>Authentication required</h2>
-
 <p>Server requires authentication for this request.</p>

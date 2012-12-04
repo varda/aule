@@ -38,7 +38,8 @@ app = Sammy '#main', ->
 
     @helper 'template', (template) ->
         RESOURCES_PREFIX + '/templates/' + template + '.hb'
-    @helper 'show', (template, data, page) ->
+    @helper 'show', (title, template, data, page) ->
+        $('h1').text title
         @partial (@template template), data, page: (@template page)
 
     # Authentication state
@@ -48,8 +49,12 @@ app = Sammy '#main', ->
 
     @helper 'resolveUri', (key, fn) ->
         resolver =
+            authentication:
+                uri: API_ROOT, get: (r) -> r.api.authentication
             samples:
                 uri: API_ROOT, get: (r) -> r.api.collections.samples
+            data_sources:
+                uri: API_ROOT, get: (r) -> r.api.collections.data_sources
             users:
                 uri: API_ROOT, get: (r) -> r.api.collections.users
         $.ajax resolver[key].uri,
@@ -70,30 +75,31 @@ app = Sammy '#main', ->
     # Todo: It is unfortunate that we need the context here to call partial...
     statusHandlers = (context) ->
         400: -> context.log 'Server says bad request'
-        401: -> context.partial RESOURCES_PREFIX + '/templates/401.mustache'
+        401: -> context.show 'Authentication required', '401'
         403: -> context.log 'Server says forbidden'
         404: -> context.log 'Server says not found'
 
     # Index
     @get '/', ->
-        @$element().html '<h2>Welcome</h2><p>Haha, this is the index :)</p>'
+        @show 'Welcome', 'index'
 
     # Status
     @get '/status', ->
         $.ajax API_ROOT,
-            success: (r) => @show 'status', r.api
+            success: (r) => @show 'Server info', 'status', r
             dataType: 'json'
 
     # Authenticate
     @post '/authenticate', ->
         @app.login = @params['login']
         @app.password = @params['password']
-        $.ajax (expand '/authentication'),
-            beforeSend: addAuthHeader
-            success: (r) =>
-                @app.user = r.authentication.user
-                @app.trigger 'authentication'
-                dataType: 'json'
+        @uri 'authentication', (uri) =>
+            $.ajax uri,
+                beforeSend: addAuthHeader
+                success: (r) =>
+                    @app.user = r.authentication.user
+                    @app.trigger 'authentication'
+                    dataType: 'json'
         return
 
     # List samples
@@ -101,15 +107,15 @@ app = Sammy '#main', ->
         @uri 'samples', (uri) =>
             $.ajax uri,
                 beforeSend: addAuthHeader
-                success: (r) => @show 'samples', r, 'samples_list'
+                success: (r) => @show 'Samples', 'samples', r, 'samples_list'
                 statusCode: statusHandlers this
                 dataType: 'json'
 
     # List samples for current user
-    @get '/mysamples', ->
+    @get '/my_samples', ->
         $.ajax (expand '/users/martijn/samples'),
             beforeSend: addAuthHeader
-            success: (r) => @show 'samples', r, 'samples_list'
+            success: (r) => @show 'Samples', 'samples', r, 'samples_list'
             statusCode: statusHandlers this
             dataType: 'json'
 
@@ -117,12 +123,12 @@ app = Sammy '#main', ->
     @get '/samples/:sample', ->
         $.ajax (expand @params['sample']),
             beforeSend: addAuthHeader
-            success: (r) => @show 'sample', r
+            success: (r) => @show "Sample: #{ r.name }" 'sample', r
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Add sample form
-    @get '/add_sample', -> @show 'samples', {}, 'samples_add'
+    @get '/add_sample', -> @show 'Samples', 'samples', {}, 'samples_add'
 
     # Add sample
     @post '/samples', ->
@@ -140,11 +146,12 @@ app = Sammy '#main', ->
 
     # List data sources
     @get '/data_sources', ->
-        $.ajax (expand '/data_sources'),
-            beforeSend: addAuthHeader
-            success: (r) => @partial RESOURCES_PREFIX + '/templates/data_sources.mustache', r
-            statusCode: statusHandlers this
-            dataType: 'json'
+        @uri 'data_sources', (uri) =>
+            $.ajax uri,
+                beforeSend: addAuthHeader
+                success: (r) => @show 'Data sources', 'data_sources', r, 'data_sources_list'
+                statusCode: statusHandlers this
+                dataType: 'json'
 
     # Show data source
     @get '/data_sources/:data_source', ->
