@@ -15,8 +15,8 @@
     <link rel="stylesheet/less" href="/varda-web/bootstrap/less/bootstrap.less" media="all" />
     <link rel="stylesheet/less" href="/varda-web/stylesheets/varda.less" media="all" />
     <script src="/varda-web/scripts/less-1.3.1.min.js"></script>
-
     <script src="/varda-web/scripts/jquery-1.7.1.min.js"></script>
+    <script src="/varda-web/bootstrap/js/bootstrap-modal.js"></script>
     <script src="/varda-web/scripts/jquery.base64.min.js"></script>
     <script src="/varda-web/scripts/handlebars-1.0.rc.1.js"></script>
     <script src="/varda-web/sammy/sammy.js"></script>
@@ -34,45 +34,58 @@
   </head>
   <body>
 
-    <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="/varda-web">Varda</a>
-          <ul class="nav">
-            <li><a href="/varda-web">Home</a></li>
-            <li><a href="/varda-web/about">About</a></li>
-            <li><a href="/varda-web/contact">Contact</a></li>
-          </ul>
-          <form class="navbar-form pull-right" action="/varda-web/authenticate" method="post" id="form-authenticate">
-            <input class="input-small" type="text" placeholder="Login" name="login">
-            <input class="input-small" type="password" placeholder="Password" name="password">
-            <button class="btn btn-primary" type="submit">Authenticate</button>
-          </form>
-        </div>
+    <div id="loading" class="modal">
+      <div class="modal-header">
+        <h3>Varda</h3>
+      </div>
+      <div class="modal-body">
+        <p>Loading server API...</p>
       </div>
     </div>
 
-    <div class="container">
-      <div class="page-header" id="header">
-        <h1></h1>
-      </div>
-      <div class="row">
-        <div class="span9" id="main"></div>
-        <div class="span3" id="sidebar">
-          <ul class="nav nav-list" id="nav">
-            <li class="nav-header">Resources</li>
-            <li><a href="/varda-web/samples">Samples</a></li>
-            <li><a href="/varda-web/data_sources">Data sources</a></li>
-            <li><a href="/varda-web/users">Users</a></li>
-            <li class="divider"></li>
-            <li><a href="/varda-web/status">Server info</a></li>
-          </ul>
+    <div id="varda" style="display:none">
+
+      <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container">
+            <a class="brand" href="/varda-web">Varda</a>
+            <ul class="nav">
+              <li><a href="/varda-web">Home</a></li>
+              <li><a href="/varda-web/about">About</a></li>
+              <li><a href="/varda-web/contact">Contact</a></li>
+            </ul>
+            <form class="navbar-form pull-right" action="/varda-web/authenticate" method="post" id="form-authenticate">
+              <input class="input-small" type="text" placeholder="Login" name="login">
+              <input class="input-small" type="password" placeholder="Password" name="password">
+              <button class="btn btn-primary" type="submit">Authenticate</button>
+            </form>
+          </div>
         </div>
       </div>
-      <footer>
-        <p>&copy; Leiden University Medical Center 2012</p>
-      </footer>
-    </div> <!-- /container -->
+
+      <div class="container">
+        <div class="page-header" id="header">
+          <h1></h1>
+        </div>
+        <div class="row">
+          <div class="span9" id="main"></div>
+          <div class="span3" id="sidebar">
+            <ul class="nav nav-list" id="nav">
+              <li class="nav-header">Resources</li>
+              <li><a href="/varda-web/samples">Samples</a></li>
+              <li><a href="/varda-web/data_sources">Data sources</a></li>
+              <li><a href="/varda-web/users">Users</a></li>
+              <li class="divider"></li>
+              <li><a href="/varda-web/server">Server info</a></li>
+            </ul>
+          </div>
+        </div>
+        <footer>
+          <p>&copy; Leiden University Medical Center 2012</p>
+        </footer>
+      </div>
+
+    </div>
 
   </body>
 </html>

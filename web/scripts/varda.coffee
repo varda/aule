@@ -48,7 +48,7 @@ app = Sammy '#main', ->
     @password = undefined
 
     # API resource URIs will be in here
-    @uris = {}
+    @uris = undefined
 
     # Add HTTP Basic Authentication header to request
     addAuthHeader = (r) =>
@@ -66,40 +66,31 @@ app = Sammy '#main', ->
     @get '/', ->
         @show 'Welcome', 'index'
 
-    # Status
-    @get '/status', ->
-        $.ajax API_ROOT,
-            success: (r) => @show 'Server info', 'status', r
+    # Server info
+    @get '/server', ->
+        $.ajax @app.uris.root,
+            success: (r) => @show 'Server info', 'server', r
             dataType: 'json'
 
     # Authenticate
     @post '/authenticate', ->
         @app.login = @params['login']
         @app.password = @params['password']
-        @uri 'authentication', (uri) =>
-            $.ajax uri,
-                beforeSend: addAuthHeader
-                success: (r) =>
-                    @app.user = r.authentication.user
-                    @app.trigger 'authentication'
-                dataType: 'json'
+        $.ajax @app.uris.authentication,
+            beforeSend: addAuthHeader
+            success: (r) =>
+                @app.user = r.authentication.user
+                @app.trigger 'authentication'
+            dataType: 'json'
         return
 
     # List samples
     @get '/samples', ->
-        console.log "hierzo: #{ @app.uri_samples }"
-        $.ajax @app.uri_samples,
+        $.ajax @app.uris.samples,
             beforeSend: addAuthHeader
             success: (r) => @show 'Samples', 'samples', r, 'samples_list'
             statusCode: statusHandlers this
             dataType: 'json'
-
-#        @uri 'samples', (uri) =>
-#            $.ajax uri,
-#                beforeSend: addAuthHeader
-#                success: (r) => @show 'Samples', 'samples', r, 'samples_list'
-#                statusCode: statusHandlers this
-#                dataType: 'json'
 
     # List samples for current user
     @get '/my_samples', ->
@@ -241,9 +232,16 @@ $ ->
         app.setLocation $(this).data('href')
 
     # Get resource URIs and run app
+    # Todo: error handling
     $.ajax API_ROOT,
         success: (r) =>
-            app.uris =_samples = r.api.collections.samples
-            console.log "zozo: #{ app.uri_samples }"
+            app.uris =
+                root: API_ROOT
+                samples: r.api.collections.samples
+                data_sources: r.api.collections.data_sources
+                users: r.api.collections.users
+                authentication: r.api.authentication
             app.run()
+            $('#varda').show()
+            $('#loading').fadeOut 'fast'
         dataType: 'json'
