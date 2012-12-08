@@ -50,9 +50,17 @@ app = Sammy '#main', ->
     # API resource URIs will be in here
     @uris = undefined
 
+    # Number of items per page
+    @pageSize = 20
+
     # Add HTTP Basic Authentication header to request
-    addAuthHeader = (r) =>
+    addAuth = (r) =>
         r.setRequestHeader 'Authorization', makeBasicAuth @login, @password
+
+    addRange = (page) =>
+        start = page * @pageSize
+        end = start + @pageSize - 1
+        (r) => r.setRequestHeader 'Range', "items=#{ start }-#{ end }"
 
     # Common handlers for response status codes
     # Todo: It is unfortunate that we need the context here to call partial...
@@ -77,7 +85,7 @@ app = Sammy '#main', ->
         @app.login = @params['login']
         @app.password = @params['password']
         $.ajax @app.uris.authentication,
-            beforeSend: addAuthHeader
+            beforeSend: addAuth
             success: (r) =>
                 @app.user = r.authentication.user
                 @app.trigger 'authentication'
@@ -86,16 +94,26 @@ app = Sammy '#main', ->
 
     # List samples
     @get '/samples', ->
+        page = parseInt @params.page ? 0
         $.ajax @app.uris.samples,
-            beforeSend: addAuthHeader
-            success: (r) => @show 'Samples', 'samples', r, 'samples_list'
+            beforeSend: (r) => addAuth r; (addRange page) r
+            success: (r, _, xhr) =>
+                range = xhr.getResponseHeader 'Content-Range'
+                total = parseInt (range.split '/')[1]
+                pages = Math.ceil total / @app.pageSize
+                if pages > 1
+                    r.pages = for p in [0...pages]
+                        page: p, label: p + 1, active: p == page
+                    if page > 0 then r.pages.prev = page: page - 1, label: page
+                    if page < pages - 1 then r.pages.next = page: page + 1, label: page + 2
+                @show 'Samples', 'samples', r, 'samples_list'
             statusCode: statusHandlers this
             dataType: 'json'
 
     # List samples for current user
     @get '/my_samples', ->
         $.ajax (expand '/users/martijn/samples'),
-            beforeSend: addAuthHeader
+            beforeSend: addAuth
             success: (r) => @show 'Samples', 'samples', r, 'samples_list'
             statusCode: statusHandlers this
             dataType: 'json'
@@ -103,7 +121,7 @@ app = Sammy '#main', ->
     # Show sample
     @get '/samples/:sample', ->
         $.ajax (expand @params['sample']),
-            beforeSend: addAuthHeader
+            beforeSend: addAuth
             success: (r) => @show "Sample: #{ r.name }" 'sample', r
             statusCode: statusHandlers this
             dataType: 'json'
@@ -114,7 +132,7 @@ app = Sammy '#main', ->
     # Add sample
     @post '/samples', ->
         $.ajax (expand '/samples'),
-            beforeSend: addAuthHeader
+            beforeSend: addAuth
             data:
                 name: @params['name']
                 coverage_threshold: @params['coverage_threshold']
@@ -129,7 +147,7 @@ app = Sammy '#main', ->
     @get '/data_sources', ->
         @uri 'data_sources', (uri) =>
             $.ajax uri,
-                beforeSend: addAuthHeader
+                beforeSend: addAuth
                 success: (r) => @show 'Data sources', 'data_sources', r, 'data_sources_list'
                 statusCode: statusHandlers this
                 dataType: 'json'
@@ -137,7 +155,7 @@ app = Sammy '#main', ->
     # Show data source
     @get '/data_sources/:data_source', ->
         $.ajax (expand @params['data_source']),
-            beforeSend: addAuthHeader
+            beforeSend: addAuth
             success: (r) => @partial RESOURCES_PREFIX + '/templates/data_source.mustache', r
             statusCode: statusHandlers this
             dataType: 'json'
@@ -149,7 +167,7 @@ app = Sammy '#main', ->
     # Add data source
     @post '/data_sources', ->
         $.ajax (expand '/data_sources'),
-            beforeSend: addAuthHeader
+            beforeSend: addAuth
             data:
                 name: @params['name']
                 filetype: @params['filetype']
@@ -163,7 +181,7 @@ app = Sammy '#main', ->
     # List users
     @get '/users', ->
         $.ajax (expand '/users'),
-            beforeSend: addAuthHeader
+            beforeSend: addAuth
             success: (r) => @partial RESOURCES_PREFIX + '/templates/users.mustache', r
             statusCode: statusHandlers this
             dataType: 'json'
@@ -171,7 +189,7 @@ app = Sammy '#main', ->
     # Show user
     @get '/users/:user', ->
         $.ajax (expand @params['user']),
-            beforeSend: addAuthHeader
+            beforeSend: addAuth
             success: (r) => @partial RESOURCES_PREFIX + '/templates/user.mustache', r
             statusCode: statusHandlers this
             dataType: 'json'
@@ -183,7 +201,7 @@ app = Sammy '#main', ->
     # Add user
     @post '/users', ->
         $.ajax (expand '/users'),
-            beforeSend: addAuthHeader
+            beforeSend: addAuth
             data:
                 name: @params['name']
                 login: @params['login']

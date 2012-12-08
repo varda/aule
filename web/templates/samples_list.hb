@@ -1,14 +1,23 @@
 {{#if samples}}
-  <div class="pagination pagination-centered">
-    <ul>
-      <li class="disabled"><a href="#">Prev</a></li>
-      <li class="active"><a href="#">1</a></li>
-      <li><a href="?page=2">2</a></li>
-      <li><a href="?page=3">3</a></li>
-      <li><a href="?page=4">4</a></li>
-      <li><a href="?page=2">Next</a></li>
-    </ul>
-  </div>
+  {{#if pages}}
+    <div class="pagination pagination-centered">
+      <ul>
+        {{#if pages.prev}}
+          <li><a href="?page={{pages.prev.page}}">←</a></li>
+        {{else}}
+          <li class="disabled"><a>←</a></li>
+        {{/if}}
+        {{#each pages}}
+          <li{{#if active}} class="active"{{/if}}><a href="?page={{page}}">{{label}}</a></li>
+        {{/each}}
+        {{#if pages.next}}
+          <li><a href="?page={{pages.next.page}}">→</a></li>
+        {{else}}
+          <li class="disabled"><a>→</a></li>
+        {{/if}}
+      </ul>
+    </div>
+  {{/if}}
   <table class="table table-hover">
     <thead><tr><th>Added</th><th>Name</th></tr></thead>
     <tbody>
@@ -20,16 +29,25 @@
       {{/each}}
     </tbody>
   </table>
-  <div class="pagination pagination-centered">
-    <ul>
-      <li><a href="#">Prev</a></li>
-      <li><a href="#">1</a></li>
-      <li><a href="#">2</a></li>
-      <li><a href="#">3</a></li>
-      <li><a href="#">4</a></li>
-      <li><a href="#">Next</a></li>
-    </ul>
-  </div>
+  {{#if pages}}
+    <div class="pagination pagination-centered">
+      <ul>
+        {{#if pages.prev}}
+          <li><a href="?page={{pages.prev.page}}">←</a></li>
+        {{else}}
+          <li class="disabled"><a>←</a></li>
+        {{/if}}
+        {{#each pages}}
+          <li{{#if active}} class="active"{{/if}}><a href="?page={{page}}">{{label}}</a></li>
+        {{/each}}
+        {{#if pages.next}}
+          <li><a href="?page={{pages.next.page}}">→</a></li>
+        {{else}}
+          <li class="disabled"><a>→</a></li>
+        {{/if}}
+      </ul>
+    </div>
+  {{/if}}
 {{else}}
   <p>No samples are here.</p>
 {{/if}}
