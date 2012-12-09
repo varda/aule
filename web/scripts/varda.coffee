@@ -111,10 +111,38 @@ app = Sammy '#main', ->
             dataType: 'json'
 
     # List samples for current user
-    @get '/my_samples', ->
-        $.ajax (expand '/users/martijn/samples'),
-            beforeSend: addAuth
-            success: (r) => @show 'Samples', 'samples', r, 'samples_list'
+    @get '/samples_own', ->
+        page = parseInt @params.page ? 0
+        $.ajax "#{ @app.uris.samples }?user=#{ encodeURIComponent @app.user?.uri }",
+            beforeSend: (r) => addAuth r; (addRange page) r
+            success: (r, _, xhr) =>
+                range = xhr.getResponseHeader 'Content-Range'
+                total = parseInt (range.split '/')[1]
+                pages = Math.ceil total / @app.pageSize
+                if pages > 1
+                    r.pages = for p in [0...pages]
+                        page: p, label: p + 1, active: p == page
+                    if page > 0 then r.pages.prev = page: page - 1, label: page
+                    if page < pages - 1 then r.pages.next = page: page + 1, label: page + 2
+                @show 'Samples', 'samples', r, 'samples_list'
+            statusCode: statusHandlers this
+            dataType: 'json'
+
+    # List public samples
+    @get '/samples_public', ->
+        page = parseInt @params.page ? 0
+        $.ajax @app.uris.samples + '?public=true',
+            beforeSend: (r) => addAuth r; (addRange page) r
+            success: (r, _, xhr) =>
+                range = xhr.getResponseHeader 'Content-Range'
+                total = parseInt (range.split '/')[1]
+                pages = Math.ceil total / @app.pageSize
+                if pages > 1
+                    r.pages = for p in [0...pages]
+                        page: p, label: p + 1, active: p == page
+                    if page > 0 then r.pages.prev = page: page - 1, label: page
+                    if page < pages - 1 then r.pages.next = page: page + 1, label: page + 2
+                @show 'Samples', 'samples', r, 'samples_list'
             statusCode: statusHandlers this
             dataType: 'json'
 
