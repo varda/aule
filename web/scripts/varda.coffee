@@ -35,12 +35,36 @@ app = Sammy '#main', ->
     @use Sammy.Handlebars, 'hb'
 
     Handlebars.registerHelper 'escape', (value) -> encodeURIComponent value
+    Handlebars.registerHelper 'if_eq', (context, options) ->
+        if context == options.hash.compare
+            options.fn @
+        else
+            options.inverse @
 
     @helper 'template', (template) ->
         RESOURCES_PREFIX + '/templates/' + template + '.hb'
+
     @helper 'show', (title, template, data, page) ->
         $('h1').text title
         @partial (@template template), data, page: (@template page)
+
+    @helper 'collection', (uri, title, template, tab) ->
+        page = parseInt @params.page ? 0
+        $.ajax uri,
+            beforeSend: (r) => addAuth r; (addRange page) r
+            success: (r, _, xhr) =>
+                data = tab: tab, samples: r.samples
+                range = xhr.getResponseHeader 'Content-Range'
+                total = parseInt (range.split '/')[1]
+                pages = Math.ceil total / @app.pageSize
+                if pages > 1
+                    data.pages = for p in [0...pages]
+                        page: p, label: p + 1, active: p == page
+                    if page > 0 then data.pages.prev = page: page - 1, label: page
+                    if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
+                @show title, template, data, "#{ template }_list"
+            statusCode: statusHandlers this
+            dataType: 'json'
 
     # Authentication state
     @user = undefined
@@ -67,7 +91,7 @@ app = Sammy '#main', ->
     statusHandlers = (context) ->
         400: -> context.log 'Server says bad request'
         401: -> context.show 'Authentication required', '401'
-        403: -> context.log 'Server says forbidden'
+        403: -> context.show 'Request not allowed', '403'
         404: -> context.log 'Server says not found'
 
     # Index
@@ -94,57 +118,17 @@ app = Sammy '#main', ->
 
     # List samples
     @get '/samples', ->
-        page = parseInt @params.page ? 0
-        $.ajax @app.uris.samples,
-            beforeSend: (r) => addAuth r; (addRange page) r
-            success: (r, _, xhr) =>
-                range = xhr.getResponseHeader 'Content-Range'
-                total = parseInt (range.split '/')[1]
-                pages = Math.ceil total / @app.pageSize
-                if pages > 1
-                    r.pages = for p in [0...pages]
-                        page: p, label: p + 1, active: p == page
-                    if page > 0 then r.pages.prev = page: page - 1, label: page
-                    if page < pages - 1 then r.pages.next = page: page + 1, label: page + 2
-                @show 'Samples', 'samples', r, 'samples_list'
-            statusCode: statusHandlers this
-            dataType: 'json'
+        @collection @app.uris.samples, 'Samples', 'samples', 'samples'
 
     # List samples for current user
     @get '/samples_own', ->
-        page = parseInt @params.page ? 0
-        $.ajax "#{ @app.uris.samples }?user=#{ encodeURIComponent @app.user?.uri }",
-            beforeSend: (r) => addAuth r; (addRange page) r
-            success: (r, _, xhr) =>
-                range = xhr.getResponseHeader 'Content-Range'
-                total = parseInt (range.split '/')[1]
-                pages = Math.ceil total / @app.pageSize
-                if pages > 1
-                    r.pages = for p in [0...pages]
-                        page: p, label: p + 1, active: p == page
-                    if page > 0 then r.pages.prev = page: page - 1, label: page
-                    if page < pages - 1 then r.pages.next = page: page + 1, label: page + 2
-                @show 'Samples', 'samples', r, 'samples_list'
-            statusCode: statusHandlers this
-            dataType: 'json'
+        @collection "#{ @app.uris.samples }?user=#{ encodeURIComponent @app.user?.uri }",
+            'Samples', 'samples', 'samples_own'
 
     # List public samples
     @get '/samples_public', ->
-        page = parseInt @params.page ? 0
-        $.ajax @app.uris.samples + '?public=true',
-            beforeSend: (r) => addAuth r; (addRange page) r
-            success: (r, _, xhr) =>
-                range = xhr.getResponseHeader 'Content-Range'
-                total = parseInt (range.split '/')[1]
-                pages = Math.ceil total / @app.pageSize
-                if pages > 1
-                    r.pages = for p in [0...pages]
-                        page: p, label: p + 1, active: p == page
-                    if page > 0 then r.pages.prev = page: page - 1, label: page
-                    if page < pages - 1 then r.pages.next = page: page + 1, label: page + 2
-                @show 'Samples', 'samples', r, 'samples_list'
-            statusCode: statusHandlers this
-            dataType: 'json'
+        @collection @app.uris.samples + '?public=true',
+            'Samples', 'samples', 'samples_public'
 
     # Show sample
     @get '/samples/:sample', ->
@@ -155,7 +139,7 @@ app = Sammy '#main', ->
             dataType: 'json'
 
     # Add sample form
-    @get '/add_sample', -> @show 'Samples', 'samples', {}, 'samples_add'
+    @get '/add_sample', -> @show 'Samples', 'samples', tab: 'add_sample', 'samples_add'
 
     # Add sample
     @post '/samples', ->
