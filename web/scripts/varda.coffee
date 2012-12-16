@@ -52,8 +52,8 @@ app = Sammy '#main', ->
         page = parseInt @params.page ? 0
         $.ajax uri,
             beforeSend: (r) => addAuth r; (addRange page) r
-            success: (r, _, xhr) =>
-                data = tab: tab, samples: r.samples
+            success: (data, _, xhr) =>
+                data.tab = tab
                 range = xhr.getResponseHeader 'Content-Range'
                 total = parseInt (range.split '/')[1]
                 pages = Math.ceil total / @app.pageSize
@@ -132,14 +132,15 @@ app = Sammy '#main', ->
 
     # Show sample
     @get '/samples/:sample', ->
-        $.ajax (expand @params['sample']),
+        $.ajax @params['sample'],
             beforeSend: addAuth
-            success: (r) => @show "Sample: #{ r.name }" 'sample', r
+            success: (r) => @show "Sample: #{ r.sample.name }", 'sample', r
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Add sample form
-    @get '/add_sample', -> @show 'Samples', 'samples', tab: 'add_sample', 'samples_add'
+    @get '/add_sample', ->
+        @show 'Samples', 'samples', tab: 'add_sample', 'samples_add'
 
     # Add sample
     @post '/samples', ->
@@ -157,24 +158,24 @@ app = Sammy '#main', ->
 
     # List data sources
     @get '/data_sources', ->
-        @uri 'data_sources', (uri) =>
-            $.ajax uri,
-                beforeSend: addAuth
-                success: (r) => @show 'Data sources', 'data_sources', r, 'data_sources_list'
-                statusCode: statusHandlers this
-                dataType: 'json'
+        @collection @app.uris.data_sources, 'Data sources', 'data_sources', 'data_sources'
+
+    # List data sources for current user
+    @get '/data_sources_own', ->
+        @collection "#{ @app.uris.data_sources }?user=#{ encodeURIComponent @app.user?.uri }",
+            'Data sources', 'data_sources', 'data_sources_own'
 
     # Show data source
     @get '/data_sources/:data_source', ->
-        $.ajax (expand @params['data_source']),
+        $.ajax @params['data_source'],
             beforeSend: addAuth
-            success: (r) => @partial RESOURCES_PREFIX + '/templates/data_source.mustache', r
+            success: (r) => @show "Data source: #{ r.data_source.name }", 'data_source', r
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Add data source form
     @get '/add_data_source', ->
-        @partial RESOURCES_PREFIX + '/templates/add_data_source.mustache'
+        @show 'Data sources', 'data_sources', tab: 'add_data_source', 'data_sources_add'
 
     # Add data source
     @post '/data_sources', ->
@@ -192,23 +193,19 @@ app = Sammy '#main', ->
 
     # List users
     @get '/users', ->
-        $.ajax (expand '/users'),
-            beforeSend: addAuth
-            success: (r) => @partial RESOURCES_PREFIX + '/templates/users.mustache', r
-            statusCode: statusHandlers this
-            dataType: 'json'
+        @collection @app.uris.users, 'Users', 'users', 'users'
 
     # Show user
     @get '/users/:user', ->
-        $.ajax (expand @params['user']),
+        $.ajax @params['user'],
             beforeSend: addAuth
-            success: (r) => @partial RESOURCES_PREFIX + '/templates/user.mustache', r
+            success: (r) => @show "User: #{ r.user.name }", 'user', r
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Add user form
     @get '/add_user', ->
-        @partial RESOURCES_PREFIX + '/templates/add_user.mustache'
+        @show 'Users', 'users', tab: 'add_user', 'users_add'
 
     # Add user
     @post '/users', ->

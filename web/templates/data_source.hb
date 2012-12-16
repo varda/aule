@@ -1,5 +1,3 @@
-<h2>Data source</h2>
-
 <p>Name: {{data_source.name}}</p>
 <p>Added: {{data_source.added}}</p>
 <p>Filetype: {{data_source.filetype}}</p>

@@ -1,4 +1,4 @@
-{{#if data_sources}}
+{{#if users}}
   {{#if pages}}
     <div class="pagination pagination-centered">
       <ul>
@@ -19,12 +19,14 @@
     </div>
   {{/if}}
   <table class="table table-hover">
-    <thead><tr><th>Added</th><th>Name</th></tr></thead>
+    <thead><tr><th>Added</th><th>Login</th><th>Name</th><th>Roles</th></tr></thead>
     <tbody>
-      {{#each data_sources}}
-      <tr data-href="/varda-web/data_sources/{{escape uri}}">
+      {{#each users}}
+      <tr data-href="/varda-web/users/{{escape uri}}">
         <td>{{added}}</td>
+        <td>{{login}}</td>
         <td>{{name}}</td>
+        <td>{{roles}}</td>
       </tr>
       {{/each}}
     </tbody>
@@ -49,5 +51,5 @@
     </div>
   {{/if}}
 {{else}}
-  <p>No data sources are here.</p>
+  <p>No users are here.</p>
 {{/if}}

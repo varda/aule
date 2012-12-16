@@ -1,5 +1,3 @@
-<h2>Sample: {{sample.name}}</h2>
-
 <ul class="nav nav-pills">
   <li class="active"><a href="/varda-web/samples">Info</a></li>
   <li><a href="/varda-web/samples">Edit sample</a></li>

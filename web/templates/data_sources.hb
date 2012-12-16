@@ -1,7 +1,7 @@
 <ul class="nav nav-pills">
-  <li class="active"><a href="/varda-web/my_data_sources">My data sources</a></li>
-  <li><a href="/varda-web/data_sources">All data sources</a></li>
-  <li><a href="/varda-web/add_data_source">Add data source</a></li>
+  <li{{#if_eq tab compare="data_sources_own"}} class="active"{{/if_eq}}><a href="/varda-web/data_sources_own"><i class="icon-th-large"></i> My data sources</a></li>
+  <li{{#if_eq tab compare="data_sources"}} class="active"{{/if_eq}}><a href="/varda-web/data_sources"><i class="icon-th"></i> All data sources</a></li>
+  <li class="{{#if_eq tab compare="add_data_source"}}active {{/if_eq}}pull-right"><a href="/varda-web/add_data_source"><i class="icon-plus"></i> Add data source</a></li>
 </ul>
 
 {{> page}}
