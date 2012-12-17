@@ -1,5 +1,5 @@
 {{#if pages}}
-  <div class="pagination pagination-centered">
+  <div class="pagination pagination-centered{{#if pages.many}} pagination-mini{{/if}}">
     <ul>
       {{#if pages.prev}}
         <li><a href="?page={{pages.prev.page}}">←</a></li>

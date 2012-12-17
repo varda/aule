@@ -64,6 +64,7 @@ app = Sammy '#main', ->
                         page: p, label: p + 1, active: p == page
                     if page > 0 then data.pages.prev = page: page - 1, label: page
                     if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
+                    if pages >= @app.manyPages then data.pages.many = true
                 @show title, template, data, "#{ template }_list"
             statusCode: statusHandlers this
             dataType: 'json'
@@ -77,7 +78,10 @@ app = Sammy '#main', ->
     @uris = undefined
 
     # Number of items per page
-    @pageSize = 20
+    @pageSize = 50
+
+    # Number of pages to be considered many
+    @manyPages = 13
 
     # Add HTTP Basic Authentication header to request
     addAuth = (r) =>
