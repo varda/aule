@@ -46,7 +46,9 @@ app = Sammy '#main', ->
 
     @helper 'show', (title, template, data, page) ->
         $('h1').text title
-        @partial (@template template), data, page: (@template page)
+        @partial (@template template), data,
+            page: (@template page)
+            pagination: (@template 'pagination')
 
     @helper 'collection', (uri, title, template, tab) ->
         page = parseInt @params.page ? 0
