@@ -164,14 +164,24 @@ app = Sammy '#main', ->
 
     # Sample variations
     @get '/samples/:sample/variations', ->
+        page = parseInt @params.page ? 0
         $.ajax @params['sample'],
             beforeSend: addAuth
             success: (r) =>
                 $.ajax r.sample.variations,
                     beforeSend: addAuth
-                    success: (v) =>
-                        $.extend r, v
-                        @show "Sample: #{ r.sample.name }", 'sample', r, 'sample_variations'
+                    success: (v, _, xhr) =>
+                        data = $.extend {}, r, v
+                        range = xhr.getResponseHeader 'Content-Range'
+                        total = parseInt (range.split '/')[1]
+                        pages = Math.ceil total / @app.pageSize
+                        if pages > 1
+                            data.pages = for p in [0...pages]
+                                page: p, label: p + 1, active: p == page
+                            if page > 0 then data.pages.prev = page: page - 1, label: page
+                            if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
+                            if pages >= @app.manyPages then data.pages.many = true
+                        @show "Sample: #{ r.sample.name }", 'sample', data, 'sample_variations'
                     statusCode: statusHandlers this
                     dataType: 'json'
             statusCode: statusHandlers this
