@@ -46,16 +46,17 @@ app = Sammy '#main', ->
 
     @helper 'show', (title, template, data, page) ->
         $('h1').text title
+        data?.current ?= page
         @partial (@template template), data,
             page: (@template page)
             pagination: (@template 'pagination')
 
-    @helper 'collection', (uri, title, template, tab) ->
+    @helper 'collection', (uri, title, template, current) ->
         page = parseInt @params.page ? 0
         $.ajax uri,
             beforeSend: (r) => addAuth r; (addRange page) r
             success: (data, _, xhr) =>
-                data.tab = tab
+                data.current = current
                 range = xhr.getResponseHeader 'Content-Range'
                 total = parseInt (range.split '/')[1]
                 pages = Math.ceil total / @app.pageSize
@@ -99,6 +100,7 @@ app = Sammy '#main', ->
         401: -> context.show 'Authentication required', '401'
         403: -> context.show 'Request not allowed', '403'
         404: -> context.log 'Server says not found'
+        501: -> context.show 'Not implemented', '501'
 
     # Index
     @get '/', ->
@@ -140,13 +142,59 @@ app = Sammy '#main', ->
     @get '/samples/:sample', ->
         $.ajax @params['sample'],
             beforeSend: addAuth
-            success: (r) => @show "Sample: #{ r.sample.name }", 'sample', r
+            success: (r) => @show "Sample: #{ r.sample.name }", 'sample', r, 'sample_show'
+            statusCode: statusHandlers this
+            dataType: 'json'
+
+    # Edit sample
+    @get '/samples/:sample/edit', ->
+        $.ajax @params['sample'],
+            beforeSend: addAuth
+            success: (r) => @show "Sample: #{ r.sample.name }", 'sample', r, 'sample_edit'
+            statusCode: statusHandlers this
+            dataType: 'json'
+
+    # Delete sample
+    @get '/samples/:sample/delete', ->
+        $.ajax @params['sample'],
+            beforeSend: addAuth
+            success: (r) => @show "Sample: #{ r.sample.name }", 'sample', r, 'sample_delete'
+            statusCode: statusHandlers this
+            dataType: 'json'
+
+    # Sample variations
+    @get '/samples/:sample/variations', ->
+        $.ajax @params['sample'],
+            beforeSend: addAuth
+            success: (r) =>
+                $.ajax r.sample.variations,
+                    beforeSend: addAuth
+                    success: (v) =>
+                        $.extend r, v
+                        @show "Sample: #{ r.sample.name }", 'sample', r, 'sample_variations'
+                    statusCode: statusHandlers this
+                    dataType: 'json'
+            statusCode: statusHandlers this
+            dataType: 'json'
+
+    # Sample coverages
+    @get '/samples/:sample/coverages', ->
+        $.ajax @params['sample'],
+            beforeSend: addAuth
+            success: (r) =>
+                $.ajax r.sample.coverages,
+                    beforeSend: addAuth
+                    success: (c) =>
+                        $.extend r, c
+                        @show "Sample: #{ r.sample.name }", 'sample', r, 'sample_coverages'
+                    statusCode: statusHandlers this
+                    dataType: 'json'
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Add sample form
-    @get '/add_sample', ->
-        @show 'Samples', 'samples', tab: 'add_sample', 'samples_add'
+    @get '/samples_add', ->
+        @show 'Samples', 'samples', {}, 'samples_add'
 
     # Add sample
     @post '/samples', ->
@@ -180,8 +228,8 @@ app = Sammy '#main', ->
             dataType: 'json'
 
     # Add data source form
-    @get '/add_data_source', ->
-        @show 'Data sources', 'data_sources', tab: 'add_data_source', 'data_sources_add'
+    @get '/data_sources_add', ->
+        @show 'Data sources', 'data_sources', 'data_sources_add'
 
     # Add data source
     @post '/data_sources', ->
@@ -210,8 +258,8 @@ app = Sammy '#main', ->
             dataType: 'json'
 
     # Add user form
-    @get '/add_user', ->
-        @show 'Users', 'users', tab: 'add_user', 'users_add'
+    @get '/user_add', ->
+        @show 'Users', 'users', 'users_add'
 
     # Add user
     @post '/users', ->

@@ -10,7 +10,7 @@
     <label for="local_path">Path on server</label>
     <input type="text" name="local_path">
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary">Add data source</button>
+      <button type="submit" class="btn btn-succes"><i class="icon-plus"></i> Add data source</button>
       <button type="reset" class="btn">Reset</button>
     </div>
   </fieldset>

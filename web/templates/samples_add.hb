@@ -7,7 +7,7 @@
     <label for="pool_size">Pool size</label>
     <input type="text" class="mini" name="pool_size" id="pool_size">
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary">Add sample</button>
+      <button type="submit" class="btn btn-success"><i class="icon-plus"></i> Add sample</button>
       <button type="reset" class="btn">Reset</button>
     </div>
   </fieldset>

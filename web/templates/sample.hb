@@ -1,30 +1,9 @@
 <ul class="nav nav-pills">
-  <li class="active"><a href="/varda-web/samples">Info</a></li>
-  <li><a href="/varda-web/samples">Edit sample</a></li>
-  <li><a href="/varda-web/add_sample">Import observations</a></li>
+  <li{{#if_eq current compare="sample_show"}} class="active"{{/if_eq}}><a href="/varda-web/samples/{{escape sample.uri}}"><i class="icon-file"></i> Details</a></li>
+  <li{{#if_eq current compare="sample_variations"}} class="active"{{/if_eq}}><a href="/varda-web/samples/{{escape sample.uri}}/variations"><i class="icon-th-large"></i> Observations</a></li>
+  <li{{#if_eq current compare="sample_coverages"}} class="active"{{/if_eq}}><a href="/varda-web/samples/{{escape sample.uri}}/coverages"><i class="icon-th-large"></i> Regions</a></li>
+  <li class="{{#if_eq current compare="sample_edit"}}active {{/if_eq}}pull-right"><a href="/varda-web/samples/{{escape sample.uri}}/edit"><i class="icon-pencil"></i> Edit sample</a></li>
+  <li class="{{#if_eq current compare="sample_delete"}}active {{/if_eq}}pull-right"><a href="/varda-web/samples/{{escape sample.uri}}/delete"><i class="icon-trash"></i> Delete sample</a></li>
 </ul>
 
-<dl>
-  <dt>Name</dt>
-  <dd>{{sample.name}}</dd>
-  <dt>Added</dd>
-  <dd>{{sample.added}}</dd>
-</dl>
-
-<hr>
-
-<h2>Import observations</h2>
-
-<!-- Todo: We cannot upload a file with Ajax -->
-<form id="import_observations" action="/api/v1/data_sources" method="post" enctype="multipart/form-data">
-  <fieldset>
-    <label>Description</label>
-    <input type="text" id="data_source_name">
-    <label>VCF file</label>
-    <input type="file" class="input-file" id="data_source_data">
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">Import observations</button>
-      <button type="reset" class="btn">Cancel</button>
-    </div>
-  </fieldset>
-</form>
+{{> page}}
