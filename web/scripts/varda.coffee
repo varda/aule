@@ -163,42 +163,40 @@ app = Sammy '#main', ->
             dataType: 'json'
 
     # Sample variations
-    @get '/samples/:sample/variations', ->
+    @get '/variations/:variations', ->
         page = parseInt @params.page ? 0
-        $.ajax @params['sample'],
+        $.ajax @params['variations'],
             beforeSend: addAuth
-            success: (r) =>
-                $.ajax r.sample.variations,
-                    beforeSend: addAuth
-                    success: (v, _, xhr) =>
-                        data = $.extend {}, r, v
-                        range = xhr.getResponseHeader 'Content-Range'
-                        total = parseInt (range.split '/')[1]
-                        pages = Math.ceil total / @app.pageSize
-                        if pages > 1
-                            data.pages = for p in [0...pages]
-                                page: p, label: p + 1, active: p == page
-                            if page > 0 then data.pages.prev = page: page - 1, label: page
-                            if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
-                            if pages >= @app.manyPages then data.pages.many = true
-                        @show "Sample: #{ r.sample.name }", 'sample', data, 'sample_variations'
-                    statusCode: statusHandlers this
-                    dataType: 'json'
+            success: (data, _, xhr) =>
+                range = xhr.getResponseHeader 'Content-Range'
+                total = parseInt (range.split '/')[1]
+                pages = Math.ceil total / @app.pageSize
+                if pages > 1
+                    data.pages = for p in [0...pages]
+                        page: p, label: p + 1, active: p == page
+                    if page > 0 then data.pages.prev = page: page - 1, label: page
+                    if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
+                    if pages >= @app.manyPages then data.pages.many = true
+                @show "Sample: #{ data.sample.name }", 'sample', data, 'sample_variations'
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Sample coverages
-    @get '/samples/:sample/coverages', ->
-        $.ajax @params['sample'],
+    @get '/coverages/:coverages', ->
+        page = parseInt @params.page ? 0
+        $.ajax @params['coverages'],
             beforeSend: addAuth
-            success: (r) =>
-                $.ajax r.sample.coverages,
-                    beforeSend: addAuth
-                    success: (c) =>
-                        $.extend r, c
-                        @show "Sample: #{ r.sample.name }", 'sample', r, 'sample_coverages'
-                    statusCode: statusHandlers this
-                    dataType: 'json'
+            success: (data, _, xhr) =>
+                range = xhr.getResponseHeader 'Content-Range'
+                total = parseInt (range.split '/')[1]
+                pages = Math.ceil total / @app.pageSize
+                if pages > 1
+                    data.pages = for p in [0...pages]
+                        page: p, label: p + 1, active: p == page
+                    if page > 0 then data.pages.prev = page: page - 1, label: page
+                    if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
+                    if pages >= @app.manyPages then data.pages.many = true
+                @show "Sample: #{ data.sample.name }", 'sample', data, 'sample_coverages'
             statusCode: statusHandlers this
             dataType: 'json'
 
@@ -328,10 +326,10 @@ $ ->
         success: (r) =>
             app.uris =
                 root: API_ROOT
-                samples: r.api.collections.samples
-                data_sources: r.api.collections.data_sources
-                users: r.api.collections.users
-                authentication: r.api.authentication
+                samples: r.api.samples_uri
+                data_sources: r.api.data_sources_uri
+                users: r.api.users_uri
+                authentication: r.api.authentication_uri
             app.run()
             $('#varda').show()
             $('#loading').fadeOut 'fast'
