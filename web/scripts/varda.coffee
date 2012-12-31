@@ -119,7 +119,7 @@ app = Sammy '#main', ->
         $.ajax @app.uris.authentication,
             beforeSend: addAuth
             success: (r) =>
-                @app.user = r.authentication.user
+                @app.user = r.user
                 @app.trigger 'authentication'
             dataType: 'json'
         return
@@ -163,11 +163,12 @@ app = Sammy '#main', ->
             dataType: 'json'
 
     # Sample variations
-    @get '/variations/:variations', ->
+    @get '/samples/:sample/variations', ->
         page = parseInt @params.page ? 0
-        $.ajax @params['variations'],
+        $.ajax @params['sample'] + '?embed=variations', # No, we really need two requests here.
             beforeSend: addAuth
             success: (data, _, xhr) =>
+                console.log data
                 range = xhr.getResponseHeader 'Content-Range'
                 total = parseInt (range.split '/')[1]
                 pages = Math.ceil total / @app.pageSize
@@ -326,10 +327,13 @@ $ ->
         success: (r) =>
             app.uris =
                 root: API_ROOT
-                samples: r.api.samples_uri
-                data_sources: r.api.data_sources_uri
-                users: r.api.users_uri
-                authentication: r.api.authentication_uri
+                samples: r.samples_uri
+                variations: r.variations_uri
+                coverages: r.coverages_uri
+                data_sources: r.data_sources_uri
+                annotations: r.annotations_uri
+                users: r.users_uri
+                authentication: r.authentication_uri
             app.run()
             $('#varda').show()
             $('#loading').fadeOut 'fast'
