@@ -51,12 +51,27 @@ app = Sammy '#main', ->
             page: (@template page)
             pagination: (@template 'pagination')
 
-    @helper 'collection', (uri, title, template, current) ->
-        page = parseInt @params.page ? 0
+    @helper 'server', (uri, options={}) ->
+        options.type ?= 'GET'
+        options.beforeSend ?= (r) -> null
         $.ajax uri,
-            beforeSend: (r) => addAuth r; (addRange page) r
+            beforeSend: (r) => addAuth r; options.beforeSend r
+            data: options.data
+            success: options.success
+            statusCode: statusHandlers this
+            dataType: 'json'
+            type: options.type
+
+    @helper 'collection', (uri, title, template, options={}) ->
+        options.current ?= template
+        options.subtemplate ?= 'list'
+        options.merge ?= {}
+        page = parseInt @params.page ? 0
+        @server uri,
+            beforeSend: (addRange page)
             success: (data, _, xhr) =>
-                data.current = current
+                $.extend data, options.merge
+                data.current = options.current
                 range = xhr.getResponseHeader 'Content-Range'
                 total = parseInt (range.split '/')[1]
                 pages = Math.ceil total / @app.pageSize
@@ -66,9 +81,7 @@ app = Sammy '#main', ->
                     if page > 0 then data.pages.prev = page: page - 1, label: page
                     if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
                     if pages >= @app.manyPages then data.pages.many = true
-                @show title, template, data, "#{ template }_list"
-            statusCode: statusHandlers this
-            dataType: 'json'
+                @show title, template, data, "#{ template }_#{ options.subtemplate }"
 
     # Authentication state
     @user = undefined
@@ -94,7 +107,6 @@ app = Sammy '#main', ->
         (r) => r.setRequestHeader 'Range', "items=#{ start }-#{ end }"
 
     # Common handlers for response status codes
-    # Todo: It is unfortunate that we need the context here to call partial...
     statusHandlers = (context) ->
         400: -> context.log 'Server says bad request'
         401: -> context.show 'Authentication required', '401'
@@ -108,109 +120,67 @@ app = Sammy '#main', ->
 
     # Server info
     @get '/server', ->
-        $.ajax @app.uris.root,
+        @server @app.uris.root,
             success: (r) => @show 'Server info', 'server', r
-            dataType: 'json'
 
     # Authenticate
     @post '/authenticate', ->
         @app.login = @params['login']
         @app.password = @params['password']
-        $.ajax @app.uris.authentication,
-            beforeSend: addAuth
+        @server @app.uris.authentication,
             success: (r) =>
                 @app.user = r.user
                 @app.trigger 'authentication'
-            dataType: 'json'
         return
 
     # List samples
     @get '/samples', ->
-        @collection @app.uris.samples, 'Samples', 'samples', 'samples'
+        @collection @app.uris.samples, 'Samples', 'samples'
 
     # List samples for current user
     @get '/samples_own', ->
         @collection "#{ @app.uris.samples }?user=#{ encodeURIComponent @app.user?.uri }",
-            'Samples', 'samples', 'samples_own'
+            'Samples', 'samples', current: 'samples_own'
 
     # List public samples
     @get '/samples_public', ->
         @collection @app.uris.samples + '?public=true',
-            'Samples', 'samples', 'samples_public'
+            'Samples', 'samples', current: 'samples_public'
 
     # Show sample
     @get '/samples/:sample', ->
-        $.ajax @params['sample'],
-            beforeSend: addAuth
+        @server @params['sample'],
             success: (r) => @show "Sample: #{ r.sample.name }", 'sample', r, 'sample_show'
-            statusCode: statusHandlers this
-            dataType: 'json'
 
     # Edit sample
     @get '/samples/:sample/edit', ->
-        $.ajax @params['sample'],
-            beforeSend: addAuth
+        @server @params['sample'],
             success: (r) => @show "Sample: #{ r.sample.name }", 'sample', r, 'sample_edit'
-            statusCode: statusHandlers this
-            dataType: 'json'
 
     # Delete sample
     @get '/samples/:sample/delete', ->
-        $.ajax @params['sample'],
-            beforeSend: addAuth
+        @server @params['sample'],
             success: (r) => @show "Sample: #{ r.sample.name }", 'sample', r, 'sample_delete'
-            statusCode: statusHandlers this
-            dataType: 'json'
 
     # Sample variations
     @get '/samples/:sample/variations', ->
-        page = parseInt @params.page ? 0
-        $.ajax @params.sample,
-            beforeSend: addAuth
+        @server @params.sample,
             success: (r) =>
-                $.ajax "#{ @app.uris.variations }?embed=data_source&sample=#{ encodeURIComponent @params.sample }",
-                    beforeSend: addAuth
-                    success: (data, _, xhr) =>
-                        data.sample = r.sample
-                        range = xhr.getResponseHeader 'Content-Range'
-                        total = parseInt (range.split '/')[1]
-                        pages = Math.ceil total / @app.pageSize
-                        if pages > 1
-                            data.pages = for p in [0...pages]
-                                page: p, label: p + 1, active: p == page
-                            if page > 0 then data.pages.prev = page: page - 1, label: page
-                            if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
-                            if pages >= @app.manyPages then data.pages.many = true
-                        @show "Sample: #{ data.sample.name }", 'sample', data, 'sample_variations'
-                    statusCode: statusHandlers this
-                    dataType: 'json'
-            statusCode: statusHandlers this
-            dataType: 'json'
+                @collection "#{ @app.uris.variations }?embed=data_source&sample=#{ encodeURIComponent @params.sample }",
+                    "Sample: #{ r.sample.name }", 'sample',
+                        current: 'sample_variations'
+                        subtemplate: 'variations'
+                        merge: r
 
     # Sample coverages
     @get '/samples/:sample/coverages', ->
-        page = parseInt @params.page ? 0
-        $.ajax @params.sample,
-            beforeSend: addAuth
+        @server @params.sample,
             success: (r) =>
-                $.ajax "#{ @app.uris.coverages }?embed=data_source&sample=#{ encodeURIComponent @params.sample }",
-                    beforeSend: addAuth
-                    success: (data, _, xhr) =>
-                        data.sample = r.sample
-                        range = xhr.getResponseHeader 'Content-Range'
-                        total = parseInt (range.split '/')[1]
-                        pages = Math.ceil total / @app.pageSize
-                        if pages > 1
-                            data.pages = for p in [0...pages]
-                                page: p, label: p + 1, active: p == page
-                            if page > 0 then data.pages.prev = page: page - 1, label: page
-                            if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
-                            if pages >= @app.manyPages then data.pages.many = true
-                        @show "Sample: #{ data.sample.name }", 'sample', data, 'sample_coverages'
-                    statusCode: statusHandlers this
-                    dataType: 'json'
-            statusCode: statusHandlers this
-            dataType: 'json'
+                @collection "#{ @app.uris.coverages }?embed=data_source&sample=#{ encodeURIComponent @params.sample }",
+                    "Sample: #{ r.sample.name }", 'sample',
+                        current: 'sample_coverages',
+                        subtemplate: 'coverages',
+                        merge: r
 
     # Add sample form
     @get '/samples_add', ->
@@ -218,34 +188,28 @@ app = Sammy '#main', ->
 
     # Add sample
     @post '/samples', ->
-        $.ajax (expand '/samples'),
-            beforeSend: addAuth
+        @server @app.uris.samples,
             data:
                 name: @params['name']
                 coverage_threshold: @params['coverage_threshold']
                 pool_size: @params['pool_size']
             success: (r) => @redirect '/samples/' + encodeURIComponent r.sample
-            statusCode: statusHandlers this
-            dataType: 'json'
             type: 'POST'
         return
 
     # List data sources
     @get '/data_sources', ->
-        @collection @app.uris.data_sources, 'Data sources', 'data_sources', 'data_sources'
+        @collection @app.uris.data_sources, 'Data sources', 'data_sources'
 
     # List data sources for current user
     @get '/data_sources_own', ->
         @collection "#{ @app.uris.data_sources }?user=#{ encodeURIComponent @app.user?.uri }",
-            'Data sources', 'data_sources', 'data_sources_own'
+            'Data sources', 'data_sources', current: 'data_sources_own'
 
     # Show data source
     @get '/data_sources/:data_source', ->
-        $.ajax @params['data_source'],
-            beforeSend: addAuth
+        @server @params['data_source'],
             success: (r) => @show "Data source: #{ r.data_source.name }", 'data_source', r
-            statusCode: statusHandlers this
-            dataType: 'json'
 
     # Add data source form
     @get '/data_sources_add', ->
@@ -253,46 +217,37 @@ app = Sammy '#main', ->
 
     # Add data source
     @post '/data_sources', ->
-        $.ajax (expand '/data_sources'),
-            beforeSend: addAuth
+        @server @app.uris.data_sources,
             data:
                 name: @params['name']
                 filetype: @params['filetype']
                 local_path: @params['local_path']
             success: (r) => @redirect '/data_sources/' + encodeURIComponent r.data_source
-            statusCode: statusHandlers this
-            dataType: 'json'
             type: 'POST'
         return
 
     # List users
     @get '/users', ->
-        @collection @app.uris.users, 'Users', 'users', 'users'
+        @collection @app.uris.users, 'Users', 'users'
 
     # Show user
     @get '/users/:user', ->
-        $.ajax @params['user'],
-            beforeSend: addAuth
+        @server @params['user'],
             success: (r) => @show "User: #{ r.user.name }", 'user', r
-            statusCode: statusHandlers this
-            dataType: 'json'
 
     # Add user form
-    @get '/user_add', ->
-        @show 'Users', 'users', 'users_add'
+    @get '/users_add', ->
+        @show 'Users', 'users', {}, 'users_add'
 
     # Add user
     @post '/users', ->
-        $.ajax (expand '/users'),
-            beforeSend: addAuth
+        @server @app.uris.users,
             data:
                 name: @params['name']
                 login: @params['login']
                 password: @params['password']
                 roles: @params['roles']
             success: (r) => @redirect '/users/' + encodeURIComponent r.user
-            statusCode: statusHandlers this
-            dataType: 'json'
             type: 'POST'
         return
 
