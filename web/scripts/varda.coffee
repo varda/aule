@@ -165,39 +165,50 @@ app = Sammy '#main', ->
     # Sample variations
     @get '/samples/:sample/variations', ->
         page = parseInt @params.page ? 0
-        $.ajax @params['sample'] + '?embed=variations', # No, we really need two requests here.
+        $.ajax @params.sample,
             beforeSend: addAuth
-            success: (data, _, xhr) =>
-                console.log data
-                range = xhr.getResponseHeader 'Content-Range'
-                total = parseInt (range.split '/')[1]
-                pages = Math.ceil total / @app.pageSize
-                if pages > 1
-                    data.pages = for p in [0...pages]
-                        page: p, label: p + 1, active: p == page
-                    if page > 0 then data.pages.prev = page: page - 1, label: page
-                    if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
-                    if pages >= @app.manyPages then data.pages.many = true
-                @show "Sample: #{ data.sample.name }", 'sample', data, 'sample_variations'
+            success: (r) =>
+                $.ajax "#{ @app.uris.variations }?embed=data_source&sample=#{ encodeURIComponent @params.sample }",
+                    beforeSend: addAuth
+                    success: (data, _, xhr) =>
+                        data.sample = r.sample
+                        range = xhr.getResponseHeader 'Content-Range'
+                        total = parseInt (range.split '/')[1]
+                        pages = Math.ceil total / @app.pageSize
+                        if pages > 1
+                            data.pages = for p in [0...pages]
+                                page: p, label: p + 1, active: p == page
+                            if page > 0 then data.pages.prev = page: page - 1, label: page
+                            if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
+                            if pages >= @app.manyPages then data.pages.many = true
+                        @show "Sample: #{ data.sample.name }", 'sample', data, 'sample_variations'
+                    statusCode: statusHandlers this
+                    dataType: 'json'
             statusCode: statusHandlers this
             dataType: 'json'
 
     # Sample coverages
-    @get '/coverages/:coverages', ->
+    @get '/samples/:sample/coverages', ->
         page = parseInt @params.page ? 0
-        $.ajax @params['coverages'],
+        $.ajax @params.sample,
             beforeSend: addAuth
-            success: (data, _, xhr) =>
-                range = xhr.getResponseHeader 'Content-Range'
-                total = parseInt (range.split '/')[1]
-                pages = Math.ceil total / @app.pageSize
-                if pages > 1
-                    data.pages = for p in [0...pages]
-                        page: p, label: p + 1, active: p == page
-                    if page > 0 then data.pages.prev = page: page - 1, label: page
-                    if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
-                    if pages >= @app.manyPages then data.pages.many = true
-                @show "Sample: #{ data.sample.name }", 'sample', data, 'sample_coverages'
+            success: (r) =>
+                $.ajax "#{ @app.uris.coverages }?embed=data_source&sample=#{ encodeURIComponent @params.sample }",
+                    beforeSend: addAuth
+                    success: (data, _, xhr) =>
+                        data.sample = r.sample
+                        range = xhr.getResponseHeader 'Content-Range'
+                        total = parseInt (range.split '/')[1]
+                        pages = Math.ceil total / @app.pageSize
+                        if pages > 1
+                            data.pages = for p in [0...pages]
+                                page: p, label: p + 1, active: p == page
+                            if page > 0 then data.pages.prev = page: page - 1, label: page
+                            if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
+                            if pages >= @app.manyPages then data.pages.many = true
+                        @show "Sample: #{ data.sample.name }", 'sample', data, 'sample_coverages'
+                    statusCode: statusHandlers this
+                    dataType: 'json'
             statusCode: statusHandlers this
             dataType: 'json'
 
