@@ -191,9 +191,8 @@ app = Sammy '#main', ->
         @server @app.uris.samples,
             data:
                 name: @params['name']
-                coverage_threshold: @params['coverage_threshold']
                 pool_size: @params['pool_size']
-            success: (r) => @redirect '/samples/' + encodeURIComponent r.sample
+            success: (r) => @redirect '/samples/' + encodeURIComponent r.sample_uri
             type: 'POST'
         return
 
