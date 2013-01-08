@@ -48,11 +48,11 @@
       <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
           <div class="container">
-            <a class="brand" href="/varda-web">Varda</a>
+            <a class="brand" href="/varda-web/">Varda</a>
             <ul class="nav">
-              <li><a href="/varda-web">Home</a></li>
-              <li><a href="/varda-web/about">About</a></li>
-              <li><a href="/varda-web/contact">Contact</a></li>
+              <li><a href="/varda-web/samples">Samples</a></li>
+              <li><a href="/varda-web/data_sources">Data sources</a></li>
+              <li><a href="/varda-web/users">Users</a></li>
             </ul>
             <form class="navbar-form pull-right" action="/varda-web/authenticate" method="post" id="form-authenticate">
               <input class="input-small" type="text" placeholder="Login" name="login">
@@ -67,19 +67,7 @@
         <div class="page-header" id="header">
           <h1></h1>
         </div>
-        <div class="row">
-          <div class="span9" id="main"></div>
-          <div class="span3" id="sidebar">
-            <ul class="nav nav-list" id="nav">
-              <li class="nav-header">Resources</li>
-              <li><a href="/varda-web/samples_own">Samples</a></li>
-              <li><a href="/varda-web/data_sources_own">Data sources</a></li>
-              <li><a href="/varda-web/users">Users</a></li>
-              <li class="divider"></li>
-              <li><a href="/varda-web/server">Server info</a></li>
-            </ul>
-          </div>
-        </div>
+        <div id="main"></div>
         <footer>
           <p>&copy; Leiden University Medical Center 2012</p>
         </footer>

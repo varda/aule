@@ -6,6 +6,9 @@
 # Todo: Some sort of message mechanism (unobtrusive popups at bottom of screen
 #     or something), i.e. to show authentication failures and other messages.
 #
+# Todo: Depending on user roles, have top navigation links go to public or
+#     private listings.
+#
 # https://github.com/BorisMoore/jsrender
 # https://github.com/sstephenson/eco
 #
@@ -44,9 +47,18 @@ app = Sammy '#main', ->
     @helper 'template', (template) ->
         RESOURCES_PREFIX + '/templates/' + template + '.hb'
 
-    @helper 'show', (title, template, data, page) ->
+    @helper 'show', (title, template, data={}, page=null) ->
         $('h1').text title
-        data?.current ?= page
+        data.current ?= page
+        data.auth = @app.user
+        if data.auth?
+            data.auth.rights =
+                list_samples: 'admin' in data.auth.roles
+                add_sample: 'importer' in data.auth.roles or 'admin' in data.auth.roles
+                list_data_sources: 'admin' in data.auth.roles
+                add_data_source: true
+                list_users: 'admin' in data.auth.roles
+                add_user: 'admin' in data.auth.roles
         @partial (@template template), data,
             page: (@template page)
             pagination: (@template 'pagination')
@@ -253,14 +265,7 @@ app = Sammy '#main', ->
     # Authentication event
     @bind 'authentication', =>
         $('#form-authenticate').removeClass 'success fail'
-        $('#nav .user').remove()
-        if @user?
-            state = 'success'
-            $('#nav').prepend $("<li class='nav-header user'>#{ @user.name }</hli>
-                                 <li class='user'><a href='#'>Profile</a></li>")
-        else
-            state = 'fail'
-        $('#form-authenticate').addClass state
+        $('#form-authenticate').addClass (if @user? then 'success' else 'fail')
         @refresh()
 
 
@@ -278,7 +283,6 @@ $ ->
     # Clear the authentication status when we type
     $('#form-authenticate input').bind 'input', ->
         $('#form-authenticate').removeClass 'success fail'
-        $('#nav .user').remove()
 
     # Todo: .live is deprecated
     $('tbody tr[data-href]').live 'click', (e) ->
