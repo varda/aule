@@ -120,7 +120,7 @@ app = Sammy '#main', ->
 
     # Common handlers for response status codes
     statusHandlers = (context) ->
-        400: -> context.log 'Server says bad request'
+        400: (xhr) -> context.log 'Server says bad request', xhr.responseText
         401: -> context.show 'Authentication required', '401'
         403: -> context.show 'Request not allowed', '403'
         404: -> context.log 'Server says not found'
@@ -144,6 +144,31 @@ app = Sammy '#main', ->
                 @app.user = r.user
                 @app.trigger 'authentication'
         return
+
+    # Show variant
+    @get '/variants/:variant', ->
+        @server @params['variant'],
+            success: (r) => @show "Variant: #{ r.variant.chromosome }:#{ r.variant.position }", 'variant', r
+
+    # Lookup variant form
+    @get '/variants_variant', ->
+        @show 'Variants', 'variants', {}, 'variants_variant'
+
+    # Lookup variant
+    # Todo: Redirect should include varda-web subdirectory.
+    @post '/variants_variant', ->
+        @server @app.uris.variants,
+            data:
+                chromosome: @params['chromosome']
+                position: @params['position']
+                reference: @params['reference']
+                observed: @params['observed']
+            success: (r) => @redirect '/variants/' + encodeURIComponent r.variant_uri
+            type: 'POST'
+        return
+
+    @get '/variants_region', ->
+        @show 'Variants', 'variants', {}, 'variants_region'
 
     # List samples
     @get '/samples', ->
@@ -302,6 +327,7 @@ $ ->
                 data_sources: r.data_sources_uri
                 annotations: r.annotations_uri
                 users: r.users_uri
+                variants: r.variants_uri
                 authentication: r.authentication_uri
             app.run()
             $('#varda').show()
