@@ -1,4 +1,6 @@
-# Varda web
+# Aulë
+#
+# A web interface to the Varda database for genomic variation frequencies.
 #
 # For templating, we currently use Moustache templates via Sammy, but if we
 # need more logic we might switch to something like JsRender or eco.
@@ -19,7 +21,7 @@
 
 
 # Prefix for resources such as templates
-RESOURCES_PREFIX = '/varda-web'
+RESOURCES_PREFIX = '/aule'
 
 
 # Root endpoint of Varda server
@@ -155,7 +157,7 @@ app = Sammy '#main', ->
         @show 'Variants', 'variants', {}, 'variants_variant'
 
     # Lookup variant
-    # Todo: Redirect should include varda-web subdirectory.
+    # Todo: Redirect should include aule subdirectory.
     @post '/variants_variant', ->
         @server @app.uris.variants,
             data:
@@ -330,6 +332,6 @@ $ ->
                 variants: r.variants_uri
                 authentication: r.authentication_uri
             app.run()
-            $('#varda').show()
+            $('#aule').show()
             $('#loading').fadeOut 'fast'
         dataType: 'json'

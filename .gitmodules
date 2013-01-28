@@ -3,4 +3,4 @@
 	url = https://github.com/martijnvermaat/bootstrap.git
 [submodule "sammy"]
 	path = sammy
-	url = https://github.com/quirkey/sammy.git
+	url = https://github.com/martijnvermaat/sammy.git

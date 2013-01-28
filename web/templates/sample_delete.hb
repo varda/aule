@@ -1,4 +1,4 @@
-<form action="/varda-web/samples/{{escape sample.uri}}/delete" method="post">
+<form action="/aule/samples/{{escape sample.uri}}/delete" method="post">
   <fieldset>
     <div class="form-actions">
       <button type="submit" class="btn btn-danger"><i class="icon-trash"></i> Delete sample</button>

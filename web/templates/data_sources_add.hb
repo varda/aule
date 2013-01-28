@@ -1,4 +1,4 @@
-<form action="/varda-web/data_sources" method="post">
+<form action="/aule/data_sources" method="post">
   <fieldset>
     <label for="name">Name</label>
     <input type="text" name="name" id="name">

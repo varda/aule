@@ -4,7 +4,7 @@
     <thead><tr><th>Added</th><th>Name</th></tr></thead>
     <tbody>
       {{#each samples}}
-      <tr data-href="/varda-web/samples/{{escape uri}}">
+      <tr data-href="/aule/samples/{{escape uri}}">
         <td>{{added}}</td>
         <td>{{name}}</td>
       </tr>

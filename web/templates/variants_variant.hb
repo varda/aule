@@ -1,4 +1,4 @@
-<form action="/varda-web/variants_variant" method="post">
+<form action="/aule/variants_variant" method="post">
   <fieldset>
     <label for="chromosome">Chromosome name</label>
     <input type="text" name="chromosome" id="chromosome">

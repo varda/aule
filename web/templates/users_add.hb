@@ -1,4 +1,4 @@
-<form action="/varda-web/users" method="post">
+<form action="/aule/users" method="post">
   <fieldset>
     <label for="name">Name</label>
     <input type="text" name="name" id="name">

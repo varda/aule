@@ -2,9 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Varda</title>
+    <title>Aulë</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Varda database for genomic variants">
+    <meta name="description" content="Aulë, a web interface to the Varda database for genomic variation frequencies">
     <meta name="author" content="Leiden University Medical Center">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
@@ -13,20 +13,20 @@
     <![endif]-->
 
     <!-- Le styles -->
-    <link rel="stylesheet/less" href="/varda-web/bootstrap/less/bootstrap.less" media="all" />
-    <link rel="stylesheet/less" href="/varda-web/stylesheets/varda.less" media="all" />
-    <link rel="stylesheet/less" href="/varda-web/bootstrap/less/responsive.less" media="all" />
-    <script src="/varda-web/scripts/less-1.3.1.min.js"></script>
-    <script src="/varda-web/scripts/jquery-1.7.1.min.js"></script>
-    <script src="/varda-web/bootstrap/js/bootstrap-transition.js"></script>
-    <script src="/varda-web/bootstrap/js/bootstrap-collapse.js"></script>
-    <script src="/varda-web/bootstrap/js/bootstrap-modal.js"></script>
-    <script src="/varda-web/scripts/jquery.base64.min.js"></script>
-    <script src="/varda-web/scripts/handlebars-1.0.rc.1.js"></script>
-    <script src="/varda-web/sammy/sammy.js"></script>
-    <script src="/varda-web/sammy/plugins/sammy.handlebars.js"></script>
-    <script src="/varda-web/scripts/coffee-script.js"></script>
-    <script src="/varda-web/scripts/varda.coffee" type="text/coffeescript"></script>
+    <link rel="stylesheet/less" href="/aule/bootstrap/less/bootstrap.less" media="all" />
+    <link rel="stylesheet/less" href="/aule/stylesheets/aule.less" media="all" />
+    <link rel="stylesheet/less" href="/aule/bootstrap/less/responsive.less" media="all" />
+    <script src="/aule/scripts/less-1.3.1.min.js"></script>
+    <script src="/aule/scripts/jquery-1.7.1.min.js"></script>
+    <script src="/aule/bootstrap/js/bootstrap-transition.js"></script>
+    <script src="/aule/bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="/aule/bootstrap/js/bootstrap-modal.js"></script>
+    <script src="/aule/scripts/jquery.base64.min.js"></script>
+    <script src="/aule/scripts/handlebars-1.0.rc.1.js"></script>
+    <script src="/aule/sammy/sammy.js"></script>
+    <script src="/aule/sammy/plugins/sammy.handlebars.js"></script>
+    <script src="/aule/scripts/coffee-script.js"></script>
+    <script src="/aule/scripts/aule.coffee" type="text/coffeescript"></script>
 
     <!-- Le fav and touch icons -->
     <!--
@@ -40,14 +40,14 @@
 
     <div id="loading" class="modal">
       <div class="modal-header">
-        <h3>Varda</h3>
+        <h3>Aulë</h3>
       </div>
       <div class="modal-body">
         <p>Loading server API...</p>
       </div>
     </div>
 
-    <div id="varda" style="display:none">
+    <div id="aule" style="display:none">
 
       <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
@@ -57,14 +57,14 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </a>
-            <a class="brand" href="/varda-web/">Varda</a>
+            <a class="brand" href="/aule/">Aulë</a>
             <ul class="nav">
               <li><a href="#">Documentation</a></li>
               <li><a href="#">Source code</a></li>
               <li><a href="#">Links</a></li>
             </ul>
             <div class="nav-collapse collapse">
-              <form class="navbar-form pull-right" action="/varda-web/authenticate" method="post" id="form-authenticate">
+              <form class="navbar-form pull-right" action="/aule/authenticate" method="post" id="form-authenticate">
                 <input class="input-small" type="text" placeholder="Login" name="login">
                 <input class="input-small" type="password" placeholder="Password" name="password">
                 <button class="btn btn-primary" type="submit"><i class="icon-user"></i> Authenticate</button>
@@ -80,17 +80,17 @@
             <div class="sidebar-nav">
               <ul class="nav nav-list">
                 <li class="nav-header">Samples</li>
-                <li><a href="/varda-web/samples">All samples</a></li>
-                <li><a href="/varda-web/samples_public">Public samples</a></li>
-                <li><a href="/varda-web/samples_own">My samples</a></li>
+                <li><a href="/aule/samples">All samples</a></li>
+                <li><a href="/aule/samples_public">Public samples</a></li>
+                <li><a href="/aule/samples_own">My samples</a></li>
                 <li class="nav-header">Data sources</li>
-                <li><a href="/varda-web/data_sources">All data sources</a></li>
-                <li><a href="/varda-web/data_sources_own">My data sources</a></li>
+                <li><a href="/aule/data_sources">All data sources</a></li>
+                <li><a href="/aule/data_sources_own">My data sources</a></li>
                 <li class="nav-header">Users</li>
-                <li><a href="/varda-web/users">All users</a></li>
+                <li><a href="/aule/users">All users</a></li>
                 <li class="nav-header">Variants</li>
-                <li><a href="/varda-web/variants_variant">Lookup variant</a></li>
-                <li><a href="/varda-web/variants_region">Lookup region</a></li>
+                <li><a href="/aule/variants_variant">Lookup variant</a></li>
+                <li><a href="/aule/variants_region">Lookup region</a></li>
               </ul>
             </div>
           </div>

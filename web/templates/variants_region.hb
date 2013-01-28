@@ -1,4 +1,4 @@
-<form action="/varda-web/variants_region" method="post">
+<form action="/aule/variants_region" method="post">
   <fieldset>
     <label for="start">Region start</label>
     <input type="text" name="start" id="start">
