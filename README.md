@@ -1,7 +1,8 @@
 Aulë
 ====
 
-A web interface to the Varda database for genomic variation frequencies.
+A web interface to the [Varda](https://github.com/martijnvermaat/varda)
+database for genomic variation frequencies.
 
 **Warning:** This is a work in progress, probably not yet ready for use!
 
