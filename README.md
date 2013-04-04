@@ -17,6 +17,8 @@ server. The HTML5 layout is based on Twitter's
 [Coffeescript](http://coffeescript.org/) using the
 [Sammy.js](http://sammyjs.org/) framework.
 
+![Screenshot](doc/aule.png)
+
 At the moment, both the Less stylesheets and the CoffeeScript files are
 compiled dynamically in the browser to CSS and JavaScript, respectively. In
 the future, we could pre-compile them. Same goes for the
