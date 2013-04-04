@@ -149,12 +149,19 @@ app = Sammy '#main', ->
 
     # Show variant
     @get '/variants/:variant', ->
+        data = {}
+        if @params['sample'] then data.sample = @params['sample']
         @server @params['variant'],
+            data:
+                data
             success: (r) => @show "Variant: #{ r.variant.chromosome }:#{ r.variant.position }", 'variant', r
 
     # Lookup variant form
     @get '/variants_variant', ->
-        @show 'Variants', 'variants', {}, 'variants_variant'
+        @server @app.uris.samples + '?public=true',
+            beforeSend: (addRange 0)
+            success: (data, _, __) =>
+                @show 'Variants', 'variants', data, 'variants_variant'
 
     # Lookup variant
     # Todo: Redirect should include aule subdirectory.
@@ -165,7 +172,7 @@ app = Sammy '#main', ->
                 position: @params['position']
                 reference: @params['reference']
                 observed: @params['observed']
-            success: (r) => @redirect '/variants/' + encodeURIComponent r.variant_uri
+            success: (r) => @redirect '/variants/' + (encodeURIComponent r.variant_uri) + '?sample=' + (encodeURIComponent @params['sample'])
             type: 'POST'
         return
 

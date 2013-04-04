@@ -1,5 +1,12 @@
 <form action="/aule/variants_variant" method="post">
   <fieldset>
+    <label for="sample">Sample</label>
+    <select class="medium" name="sample" id="sample">
+      <option value="">None (global)</option>
+      {{#each samples}}
+        <option value="{{uri}}">{{name}}</option>
+      {{/each}}
+    </select>
     <label for="chromosome">Chromosome name</label>
     <input type="text" name="chromosome" id="chromosome">
     <label for="position">Position</label>
