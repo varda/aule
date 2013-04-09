@@ -72,6 +72,7 @@ app = Sammy '#main', ->
             beforeSend: (r) => addAuth r; options.beforeSend r
             data: options.data
             success: options.success
+            error: options.error
             statusCode: statusHandlers this
             dataType: 'json'
             type: options.type
@@ -96,6 +97,8 @@ app = Sammy '#main', ->
                     if page < pages - 1 then data.pages.next = page: page + 1, label: page + 2
                     if pages >= @app.manyPages then data.pages.many = true
                 @show title, template, data, "#{ template }_#{ options.subtemplate }"
+            error: =>
+                @show title, template, options.merge, "#{ template }_#{ options.subtemplate }"
 
     # Authentication state
     @user = undefined
