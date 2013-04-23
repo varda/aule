@@ -28,6 +28,10 @@ RESOURCES_PREFIX = '/aule'
 API_ROOT = '/'
 
 
+# Accepted server API versions
+ACCEPT_VERSION = '>=0.2.0,<0.3.0'
+
+
 # Create HTTP Basic Authentication header value
 makeBasicAuth = (login, password) ->
     'Basic ' + $.base64.encode (login + ':' + password)
@@ -69,7 +73,7 @@ app = Sammy '#main', ->
         options.type ?= 'GET'
         options.beforeSend ?= (r) -> null
         $.ajax uri,
-            beforeSend: (r) => addAuth r; options.beforeSend r
+            beforeSend: (r) => addAuth r; addVersion r; options.beforeSend r
             data: options.data
             success: options.success
             error: options.error
@@ -117,6 +121,10 @@ app = Sammy '#main', ->
     # Add HTTP Basic Authentication header to request
     addAuth = (r) =>
         r.setRequestHeader 'Authorization', makeBasicAuth @login, @password
+
+    # Add Accept-Version header to request
+    addVersion = (r) =>
+        r.setRequestHeader 'Accept-Version', ACCEPT_VERSION
 
     addRange = (page) =>
         start = page * @pageSize
@@ -330,7 +338,12 @@ $ ->
     # Get resource URIs and run app
     # Todo: error handling
     $.ajax API_ROOT,
+        dataType: 'json'
+        beforeSend: (r) => r.setRequestHeader 'Accept-Version', ACCEPT_VERSION
         success: (r) =>
+            if r.status != 'ok'
+                $('#loading').append $('<div class="modal-error"><p class="alert alert-error"><strong>Error:</strong> Unexpected response from server</p></div>')
+                return
             app.uris =
                 root: API_ROOT
                 samples: r.samples_uri
@@ -344,4 +357,5 @@ $ ->
             app.run()
             $('#aule').show()
             $('#loading').fadeOut 'fast'
-        dataType: 'json'
+        error: =>
+            $('#loading').append $('<div class="modal-error"><p class="alert alert-error"><strong>Error:</strong> Could not connect to server</p></div>')
