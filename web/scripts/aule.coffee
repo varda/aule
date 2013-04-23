@@ -14,8 +14,8 @@
 # https://github.com/BorisMoore/jsrender
 # https://github.com/sstephenson/eco
 #
-# Copyright (c) 2011-2012, Leiden University Medical Center <humgen@lumc.nl>
-# Copyright (C) 2011-2012, Martijn Vermaat <m.vermaat.hg@lumc.nl>
+# Copyright (c) 2011-2013, Leiden University Medical Center <humgen@lumc.nl>
+# Copyright (C) 2011-2013, Martijn Vermaat <m.vermaat.hg@lumc.nl>
 #
 # Licensed under the MIT license, see the LICENSE file.
 
