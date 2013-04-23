@@ -346,14 +346,15 @@ $ ->
                 return
             app.uris =
                 root: API_ROOT
-                samples: r.samples_uri
-                variations: r.variations_uri
-                coverages: r.coverages_uri
-                data_sources: r.data_sources_uri
-                annotations: r.annotations_uri
-                users: r.users_uri
-                variants: r.variants_uri
-                authentication: r.authentication_uri
+                samples: r.sample_collection.uri
+                variations: r.variation_collection.uri
+                coverages: r.coverage_collection.uri
+                data_sources: r.data_source_collection.uri
+                annotations: r.annotation_collection.uri
+                users: r.user_collection.uri
+                variants: r.variant_collection.uri
+                authentication: r.authentication.uri
+                genome: r.genome.uri
             app.run()
             $('#aule').show()
             $('#loading').fadeOut 'fast'
