@@ -4,7 +4,7 @@
     <thead><tr><th>Added</th><th>Name</th></tr></thead>
     <tbody>
       {{#each data_sources}}
-      <tr data-href="/aule/data_sources/{{escape uri}}">
+      <tr data-href="{{../base}}/data_sources/{{escape uri}}">
         <td>{{added}}</td>
         <td>{{name}}</td>
       </tr>

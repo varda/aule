@@ -1,3 +1,5 @@
+{{#title}}Variant: {{variant.chromosome}}:{{variant.position}}{{/title}}
+
 <dl class="dl-horizontal">
   <dt>Sample</dt>
   <dd>{{#if variant.sample_uri}}{{variant.sample_uri}}{{else}}None (global){{/if}}</dd>

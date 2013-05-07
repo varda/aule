@@ -1,12 +1,4 @@
-@green: #00A301;
-@red: #E51400;
-
-@textGray: #080808;
-
-@inputSuccess: lighten(@green, 5%);
-@inputSuccessHighlight: darken(@green, 5%);
-@inputFail: lighten(@red, 5%);
-@inputFailHighlight: darken(@red, 5%);
+@import "../bootstrap/less/variables.less";
 
 body {
     padding-top: 60px;
@@ -33,30 +25,30 @@ tbody tr[data-href] {
     cursor: pointer;
 }
 
-#form-authenticate.success input {
-    background: @inputSuccess;
-    color: white;
-    &:hover {
-        background: @inputSuccessHighlight;
-    }
-    &:focus,
-    &.focus {
-        background: white;
-        color: @textGray;
-        text-shadow: 0 1px 0 white;
+#waiting {
+    display: none;
+}
+
+#messages {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    > div {
+        position: relative;
+        z-index: 9999;
+        margin: 5px 0px;
+        > strong {
+            padding-right: 10px;
+        }
     }
 }
 
+#form-authenticate.success input {
+    background: @green;
+    color: @white;
+}
+
 #form-authenticate.fail input {
-    background: @inputFail;
-    color: white;
-    &:hover {
-        background: @inputFailHighlight;
-    }
-    &:focus,
-    &.focus {
-        background: white;
-        color: @textGray;
-        text-shadow: 0 1px 0 white;
-    }
+    background: @red;
+    color: @white;
 }

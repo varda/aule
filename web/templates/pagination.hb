@@ -1,16 +1,16 @@
-{{#if pages}}
-  <div class="pagination pagination-centered{{#if pages.many}} pagination-mini{{/if}}">
+{{#if pagination}}
+  <div class="pagination pagination-centered{{#if pagination.many_pages}} pagination-mini{{/if}}">
     <ul>
-      {{#if pages.prev}}
-        <li><a href="?page={{pages.prev.page}}">←</a></li>
+      {{#if pagination.previous}}
+        <li><a href="?{{query path page=pagination.previous.page}}">←</a></li>
       {{else}}
         <li class="disabled"><a>←</a></li>
       {{/if}}
-      {{#each pages}}
-        <li{{#if active}} class="active"{{/if}}><a href="?page={{page}}">{{label}}</a></li>
+      {{#each pagination.pages}}
+        <li{{#if active}} class="active"{{/if}}><a href="?{{query ../path page=page}}">{{label}}</a></li>
       {{/each}}
-      {{#if pages.next}}
-        <li><a href="?page={{pages.next.page}}">→</a></li>
+      {{#if pagination.next}}
+        <li><a href="?{{query path page=pagination.next.page}}">→</a></li>
       {{else}}
         <li class="disabled"><a>→</a></li>
       {{/if}}

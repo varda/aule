@@ -1,3 +1,5 @@
+{{#title}}Data source: {{data_source.name}}{{/title}}
+
 <p>Name: {{data_source.name}}</p>
 <p>Added: {{data_source.added}}</p>
 <p>Filetype: {{data_source.filetype}}</p>

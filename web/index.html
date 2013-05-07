@@ -16,17 +16,7 @@
     <link rel="stylesheet/less" href="/aule/bootstrap/less/bootstrap.less" media="all" />
     <link rel="stylesheet/less" href="/aule/stylesheets/aule.less" media="all" />
     <link rel="stylesheet/less" href="/aule/bootstrap/less/responsive.less" media="all" />
-    <script src="/aule/scripts/less-1.3.1.min.js"></script>
-    <script src="/aule/scripts/jquery-1.7.1.min.js"></script>
-    <script src="/aule/bootstrap/js/bootstrap-transition.js"></script>
-    <script src="/aule/bootstrap/js/bootstrap-collapse.js"></script>
-    <script src="/aule/bootstrap/js/bootstrap-modal.js"></script>
-    <script src="/aule/scripts/jquery.base64.min.js"></script>
-    <script src="/aule/scripts/handlebars-1.0.rc.1.js"></script>
-    <script src="/aule/sammy/sammy.js"></script>
-    <script src="/aule/sammy/plugins/sammy.handlebars.js"></script>
-    <script src="/aule/scripts/coffee-script.js"></script>
-    <script src="/aule/scripts/aule.coffee" type="text/coffeescript"></script>
+    <script data-main="/aule/scripts/main.js" src="/aule/scripts/vendor/require.js"></script>
 
     <!-- Le fav and touch icons -->
     <!--
@@ -64,6 +54,7 @@
               <li><a href="https://github.com/martijnvermaat/varda">Varda</a></li>
               <li><a href="https://github.com/martijnvermaat/manwe">Manwë</a></li>
             </ul>
+            <p id="waiting" class="nav navbar-text muted">(loading...)</p>
             <div class="nav-collapse collapse">
               <form class="navbar-form pull-right" action="/aule/authenticate" method="post" id="form-authenticate">
                 <input class="input-small" type="text" placeholder="Login" name="login">
@@ -82,11 +73,11 @@
               <ul class="nav nav-list">
                 <li class="nav-header">Samples</li>
                 <li><a href="/aule/samples">All samples</a></li>
-                <li><a href="/aule/samples_public">Public samples</a></li>
-                <li><a href="/aule/samples_own">My samples</a></li>
+                <li><a href="/aule/samples?filter=public">Public samples</a></li>
+                <li><a href="/aule/samples?filter=own">My samples</a></li>
                 <li class="nav-header">Data sources</li>
                 <li><a href="/aule/data_sources">All data sources</a></li>
-                <li><a href="/aule/data_sources_own">My data sources</a></li>
+                <li><a href="/aule/data_sources?filter=own">My data sources</a></li>
                 <li class="nav-header">Users</li>
                 <li><a href="/aule/users">All users</a></li>
                 <li class="nav-header">Variants</li>
@@ -100,6 +91,7 @@
               <h1></h1>
             </div>
             <div id="main"></div>
+            <div id="messages"></div>
           </div>
         </div>
       </div>
