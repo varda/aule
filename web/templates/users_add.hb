@@ -10,7 +10,7 @@
     <label for="roles">Roles</label>
     <input type="text" name="roles" id="roles">
     <div class="form-actions">
-      <button type="submit" class="btn btn-succes"><i class="icon-plus"></i> Add user</button>
+      <button type="submit" class="btn btn-success"><i class="icon-plus"></i> Add user</button>
       <button type="reset" class="btn">Reset</button>
     </div>
   </fieldset>

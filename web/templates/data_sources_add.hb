@@ -1,16 +1,16 @@
 <form action="/aule/data_sources" method="post">
   <fieldset>
     <label for="name">Name</label>
-    <input type="text" name="name" id="name">
+    <input type="text" class="input-xlarge" name="name" id="name">
     <label for="filetype">Filetype</label>
     <select class="medium" name="filetype" id="filetype">
       <option>vcf</option>
       <option>bed</option>
     </select>
     <label for="local_path">Path on server</label>
-    <input type="text" name="local_path">
+    <input type="text" class="input-xlarge" name="local_path">
     <div class="form-actions">
-      <button type="submit" class="btn btn-succes"><i class="icon-plus"></i> Add data source</button>
+      <button type="submit" class="btn btn-success"><i class="icon-plus"></i> Add data source</button>
       <button type="reset" class="btn">Reset</button>
     </div>
   </fieldset>

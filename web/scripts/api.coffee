@@ -96,6 +96,12 @@ define ['jquery', 'jquery.base64'], ($) ->
                 uri += "?user=#{ encodeURIComponent @current_user?.uri }"
             @collection uri, options
 
+        create_data_source: (options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.data_source
+            options.method = 'POST'
+            @request @uris.data_sources, options
+
         sample: (uri, options={}) =>
             success = options.success
             options.success = (data) -> success? data.sample
@@ -109,6 +115,12 @@ define ['jquery', 'jquery.base64'], ($) ->
                 uri += '?public=true'
             @collection uri, options
 
+        create_sample: (options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.sample
+            options.method = 'POST'
+            @request @uris.samples, options
+
         user: (uri, options={}) =>
             success = options.success
             options.success = (data) -> success? data.user
@@ -116,6 +128,12 @@ define ['jquery', 'jquery.base64'], ($) ->
 
         users: (options={}) =>
             @collection @uris.users, options
+
+        create_user: (options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.user
+            options.method = 'POST'
+            @request @uris.users, options
 
         variations: (options={}) =>
             uri = @uris.variations + '?embed=data_source'

@@ -169,16 +169,18 @@ define ['jquery',
         @get '/data_sources_add', ->
             @show 'data_sources', {}, {subpage: 'add'}
 
-        # Add data source
+        # Add data source.
         @post '/data_sources', ->
-            @server @app.uris.data_sources,
+            @app.api.create_data_source
                 data:
-                    name: @params['name']
-                    filetype: @params['filetype']
-                    local_path: @params['local_path']
-                success: (r) => @redirect '/data_sources/' + encodeURIComponent r.data_source
-                type: 'POST'
-            return
+                    name: @params.name
+                    filetype: @params.filetype
+                    local_path: @params.local_path
+                success: (data_source) =>
+                    location = config.RESOURCES_PREFIX + '/data_sources/'
+                    location += (encodeURIComponent data_source.uri)
+                    @redirect location
+                error: (code, message) => @error message
 
         # List samples.
         @get '/samples', ->
@@ -195,15 +197,19 @@ define ['jquery',
         @get '/samples_add', ->
             @show 'samples', {}, {subpage: 'add'}
 
-        # Add sample
+        # Add sample.
         @post '/samples', ->
-            @server @app.uris.samples,
+            @app.api.create_sample
                 data:
                     name: @params.name
                     pool_size: @params.pool_size
-                success: (r) => @redirect '/samples/' + encodeURIComponent r.sample_uri
-                type: 'POST'
-            return
+                    coverage_profile: @params.coverage_profile
+                    public: @params.public
+                success: (sample) =>
+                    location = config.RESOURCES_PREFIX + '/samples/'
+                    location += (encodeURIComponent sample.uri)
+                    @redirect location
+                error: (code, message) => @error message
 
         # Show sample.
         @get '/samples/:sample', ->
@@ -254,7 +260,7 @@ define ['jquery',
                         error: (code, message) => @error message
                 error: (code, message) => @error message
 
-        # List users
+        # List users.
         @get '/users', ->
             @app.api.users
                 filter: @params.filter
@@ -276,17 +282,19 @@ define ['jquery',
         @get '/users_add', ->
             @show 'users', {}, {subpage: 'add'}
 
-        # Add user
+        # Add user.
         @post '/users', ->
-            @server @app.uris.users,
+            @app.api.create_user
                 data:
-                    name: @params['name']
-                    login: @params['login']
-                    password: @params['password']
-                    roles: @params['roles']
-                success: (r) => @redirect '/users/' + encodeURIComponent r.user
-                type: 'POST'
-            return
+                    name: @params.name
+                    login: @params.login
+                    password: @params.password
+                    roles: @params.roles
+                success: (user) =>
+                    location = config.RESOURCES_PREFIX + '/users/'
+                    location += (encodeURIComponent user.uri)
+                    @redirect location
+                error: (code, message) => @error message
 
         # Lookup variant form.
         @get '/variants_variant', ->
@@ -315,7 +323,7 @@ define ['jquery',
                 success: (variant) => @show 'variant', {variant: variant}
                 error: (code, message) => @error message
 
-        # Lookup variant
+        # Lookup variant.
         @post '/variants_variant', ->
             @app.api.create_variant
                 data:
