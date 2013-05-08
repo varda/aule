@@ -43,6 +43,39 @@ define ['jquery',
                     params = parseParamPair params, (decode pair[0]), (decode pair[1] ? '')
             params
 
+        # Create pagination data for use in template.
+        createPagination = (total, current=0) ->
+            if total <= 1 then return null
+            pagination =
+                pages: for p in [0...total]
+                    page: p
+                    label: p + 1
+                    active: p == current
+                many_pages: total >= config.MANY_PAGES
+            if current > 0
+                pagination.previous = page: current - 1, label: current
+            if current < total - 1
+                pagination.next = page: current + 1, label: current + 2
+            pagination
+
+        # Create authentication data for use in template.
+        createAuth = () =>
+            if not @api.current_user? then return null
+            roles = @api.current_user.roles
+            user: @api.current_user
+            roles:
+                admin: 'admin' in roles
+                importer: 'importer' in roles
+                annotator: 'annotator' in roles
+                trader: 'trader' in roles
+            rights:
+                list_samples: 'admin' in roles
+                add_sample: 'importer' in roles or 'admin' in roles
+                list_data_sources: 'admin' in roles
+                add_data_source: true
+                list_users: 'admin' in roles
+                add_user: 'admin' in roles
+
         # We use Handlebars for templates.
         @use Sammy.Handlebars, 'hb'
 
@@ -77,45 +110,20 @@ define ['jquery',
 
         # Show main page content.
         @helper 'show', (page, data={}, options={}) ->
+            partials = {}
             data.base = config.RESOURCES_PREFIX
             data.path = @path
             data.page = page
             data.subpage = options.subpage
-            if @app.api.current_user?
-                # Todo: Refactor the whole roles/rights thing.
-                roles = @app.api.current_user.roles
-                data.auth =
-                    user: @app.api.current_user
-                    rights:
-                        list_samples: 'admin' in roles
-                        add_sample: 'importer' in roles or 'admin' in roles
-                        list_data_sources: 'admin' in roles
-                        add_data_source: true
-                        list_users: 'admin' in roles
-                        add_user: 'admin' in roles
-            partials = {}
+            data.auth = createAuth()
             if options.subpage?
                 partials.subpage = @template "#{page}_#{options.subpage}"
             if options.pagination?
                 partials.pagination = @template 'pagination'
-                if options.pagination.total > 1
-                    data.pagination =
-                        pages:
-                            for p in [0...options.pagination.total]
-                                page: p
-                                label: p + 1
-                                active: p == options.pagination.current
-                        many_pages:
-                            options.pagination.total >= config.MANY_PAGES
-                    if options.pagination.current > 0
-                        data.pagination.previous =
-                            page: options.pagination.current - 1
-                            label: options.pagination.current
-                    if options.pagination.current < options.pagination.total - 1
-                        data.pagination.next =
-                            page: options.pagination.current + 1
-                            label: options.pagination.current + 2
+                {total, current} = options.pagination
+                data.pagination = createPagination total, current
             @partial (@template page), data, partials
+            @render((@template 'navigation'), data).replace $('#navigation')
 
         # Index.
         @get '/', ->

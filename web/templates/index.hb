@@ -1,9 +1,13 @@
-{{#title}}Welcome{{/title}}
+{{#title}}Welcome to Aulë{{/title}}
 
-<p>This is the index page.</p>
+<p>Aulë is a web interface to
+the <a href="https://github.com/martijnvermaat/varda">Varda</a>
+database for genomic variation frequencies.</p>
 
+<!--
 {{#if auth}}
   <p>Logged in as {{auth.user.name}}.</p>
 {{else}}
   <p>Not logged in.</p>
 {{/if}}
+-->
