@@ -5,7 +5,7 @@
     <tbody>
       {{#each samples}}
       <tr data-href="{{../base}}/samples/{{escape uri}}">
-        <td>{{added}}</td>
+        <td>{{dateFormat added}}</td>
         <td>{{name}}</td>
       </tr>
       {{/each}}

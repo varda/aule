@@ -5,7 +5,7 @@
     <tbody>
       {{#each data_sources}}
       <tr data-href="{{../base}}/data_sources/{{escape uri}}">
-        <td>{{added}}</td>
+        <td>{{dateFormat added}}</td>
         <td>{{name}}</td>
       </tr>
       {{/each}}

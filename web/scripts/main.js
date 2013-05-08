@@ -35,7 +35,14 @@ require({
         'jquery': 'vendor/jquery',
         'jquery.base64': 'vendor/jquery.base64',
         'less': 'vendor/less',
+        'moment': 'vendor/moment',
         'sammy': '../sammy/sammy',
         'sammy.handlebars': '../sammy/plugins/sammy.handlebars'
     }
-}, ['jquery', 'less', 'bootstrap-alert', 'bootstrap-collapse', 'bootstrap-modal', 'bootstrap-transition', 'cs!init']);
+}, ['jquery',
+    'less',
+    'bootstrap-alert',
+    'bootstrap-collapse',
+    'bootstrap-modal',
+    'bootstrap-transition',
+    'cs!init']);

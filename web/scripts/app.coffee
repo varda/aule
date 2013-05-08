@@ -11,8 +11,9 @@ define ['jquery',
         'cs!config',
         'sammy',
         'handlebars',
+        'moment',
         'jquery.base64',
-        'sammy.handlebars'], ($, config, Sammy, Handlebars) ->
+        'sammy.handlebars'], ($, config, Sammy, Handlebars, moment) ->
 
     Sammy '#main', ->
 
@@ -46,6 +47,7 @@ define ['jquery',
         @use Sammy.Handlebars, 'hb'
 
         # Some helpers for use in the templates.
+        # With inspiration from: https://github.com/raDiesle/Handlebars.js-helpers-collection
         Handlebars.registerHelper 'escape', (value) ->
             encodeURIComponent value
         Handlebars.registerHelper 'if_eq', (context, options) ->
@@ -58,6 +60,8 @@ define ['jquery',
             return
         Handlebars.registerHelper 'query', (path, options) ->
             $.param $.extend (parseQueryString path), options.hash
+        Handlebars.registerHelper 'dateFormat', (date, options) ->
+            moment(date).format options.hash.format ? 'MMM Do, YYYY'
 
         # Get location for template.
         @helper 'template', (name) ->

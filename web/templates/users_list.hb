@@ -5,7 +5,7 @@
     <tbody>
       {{#each users}}
       <tr data-href="{{../base}}/users/{{escape uri}}">
-        <td>{{added}}</td>
+        <td>{{dateFormat added}}</td>
         <td>{{login}}</td>
         <td>{{name}}</td>
         <td>{{roles}}</td>
