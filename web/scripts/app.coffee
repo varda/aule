@@ -182,6 +182,7 @@ define ['jquery',
                     @redirect location
                     @success "Added data source '#{@params.name}'"
                 error: (code, message) => @error message
+            return
 
         # List samples.
         @get '/samples', ->
@@ -204,14 +205,15 @@ define ['jquery',
                 data:
                     name: @params.name
                     pool_size: @params.pool_size
-                    coverage_profile: @params.coverage_profile
-                    public: @params.public
+                    coverage_profile: @params.coverage_profile?
+                    public: @params.public?
                 success: (sample) =>
                     location = config.RESOURCES_PREFIX + '/samples/'
                     location += (encodeURIComponent sample.uri)
                     @redirect location
                     @success "Added sample '#{@params.name}'"
                 error: (code, message) => @error message
+            return
 
         # Show sample.
         @get '/samples/:sample', ->
@@ -220,12 +222,34 @@ define ['jquery',
                     @show 'sample', {sample: sample}, {subpage: 'show'}
                 error: (code, message) => @error message
 
-        # Edit sample.
+        # Edit sample form.
         @get '/samples/:sample/edit', ->
             @app.api.sample @params.sample,
                 success: (sample) =>
                     @show 'sample', {sample: sample}, {subpage: 'edit'}
                 error: (code, message) => @error message
+
+        # Edit sample.
+        @post '/samples/:sample/edit', ->
+            if not @params.dirty
+                @error 'Sample is unchanged'
+                return
+            params = {}
+            for field in @params.dirty.split ','
+                if field in ['coverage_profile', 'public']
+                    value = @params[field]?
+                else
+                    value = @params[field]
+                params[field] = value
+            @app.api.edit_sample @params.sample,
+                data: params
+                success: (sample) =>
+                    location = config.RESOURCES_PREFIX + '/samples/'
+                    location += (encodeURIComponent sample.uri)
+                    @redirect location
+                    @success "Edited sample '#{@params.name}'"
+                error: (code, message) => @error message
+            return
 
         # Delete sample.
         @get '/samples/:sample/delete', ->
@@ -298,6 +322,7 @@ define ['jquery',
                     @redirect location
                     @success "Added user '#{@params.name}'"
                 error: (code, message) => @error message
+            return
 
         # Lookup variant form.
         @get '/variants_variant', ->
@@ -341,3 +366,4 @@ define ['jquery',
                         location += '?sample=' + (encodeURIComponent @params.sample)
                     @redirect location
                 error: (code, message) => @error message
+            return

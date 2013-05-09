@@ -121,6 +121,12 @@ define ['jquery', 'jquery.base64'], ($) ->
             options.method = 'POST'
             @request @uris.samples, options
 
+        edit_sample: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.sample
+            options.method = 'PATCH'
+            @request uri, options
+
         user: (uri, options={}) =>
             success = options.success
             options.success = (data) -> success? data.user

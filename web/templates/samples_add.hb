@@ -1,4 +1,4 @@
-<form action="/aule/samples" method="post">
+<form action="{{base}}/samples" method="post">
   <fieldset>
     <label for="name">Sample name</label>
     <input type="text" class="input-xlarge" name="name" id="name">

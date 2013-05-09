@@ -1,4 +1,4 @@
-<form action="/aule/data_sources" method="post">
+<form action="{{base}}/data_sources" method="post">
   <fieldset>
     <label for="name">Name</label>
     <input type="text" class="input-xlarge" name="name" id="name">

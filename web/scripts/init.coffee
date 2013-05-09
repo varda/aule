@@ -29,6 +29,29 @@ define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
         $('#form-authenticate input').bind 'input', ->
             $('#form-authenticate').removeClass 'success fail'
 
+        # Helper function for updating dirty flags on edit forms. Both
+        # arguments should be jQuery objects.
+        setDirty = (field, label) ->
+            field.addClass 'dirty'
+            label.addClass 'dirty'
+            # Here we aggregate the names of the dirty form fields into the
+            # field '#dirty'. Unfortunately I couldn't manage to do this in
+            # the form submit handler because it would always be called after
+            # the Sammy route was called. So we do this aggregation on every
+            # field change (this includes pressing a key in a text field).
+            form = field.closest 'form'
+            $('#dirty', form).val ($(x).attr 'name' for x in $(':input.dirty', form))
+
+        # Keep track of dirty fields in edit forms.
+        $(document).delegate '.form-edit :input', 'input', ->
+            setDirty $(@), $("label[for='#{ @id }']")
+        $(document).delegate '.form-edit input:checkbox, .form-edit input:radio',
+            'change', ->
+                setDirty $(@), $(@).parent('label')
+        $(document).delegate '.form-edit', 'reset', ->
+            $(':input, label', @).removeClass 'dirty'
+            $('#dirty', @).val []
+
         # Facilitate clicking anywhere in a table row.
         $(document).delegate 'tbody tr[data-href]', 'click', (e) ->
             e.preventDefault()

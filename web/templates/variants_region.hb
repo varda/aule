@@ -1,4 +1,4 @@
-<form action="/aule/variants_region" method="post">
+<form action="{{base}}/variants_region" method="post">
   <fieldset>
     <label for="sample">Sample</label>
     <select class="medium" name="sample" id="sample">

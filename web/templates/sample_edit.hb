@@ -1,4 +1,5 @@
-<form action="/aule/samples/{{escape sample.uri}}/edit" method="post">
+<form action="{{base}}/samples/{{escape sample.uri}}/edit" method="post" class="form-edit">
+  <input type="hidden" name="dirty" id="dirty" value="">
   <fieldset>
     <label for="name">Sample name</label>
     <input type="text" class="input-xlarge" name="name" id="name" value="{{sample.name}}">
