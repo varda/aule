@@ -180,6 +180,7 @@ define ['jquery',
                     location = config.RESOURCES_PREFIX + '/data_sources/'
                     location += (encodeURIComponent data_source.uri)
                     @redirect location
+                    @success "Added data source '#{@params.name}'"
                 error: (code, message) => @error message
 
         # List samples.
@@ -209,6 +210,7 @@ define ['jquery',
                     location = config.RESOURCES_PREFIX + '/samples/'
                     location += (encodeURIComponent sample.uri)
                     @redirect location
+                    @success "Added sample '#{@params.name}'"
                 error: (code, message) => @error message
 
         # Show sample.
@@ -294,6 +296,7 @@ define ['jquery',
                     location = config.RESOURCES_PREFIX + '/users/'
                     location += (encodeURIComponent user.uri)
                     @redirect location
+                    @success "Added user '#{@params.name}'"
                 error: (code, message) => @error message
 
         # Lookup variant form.
