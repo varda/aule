@@ -1,4 +1,4 @@
-{{#title}}Variant: {{variant.chromosome}}:{{variant.position}}{{/title}}
+{{#title}}{{variant.chromosome}}:{{variant.position}}{{/title}}
 
 <dl class="dl-horizontal">
   <dt>Sample</dt>

@@ -1,8 +1,8 @@
-{{#title}}Sample: {{sample.name}}{{/title}}
+{{#title}}{{sample.name}}{{/title}}
 
 <ul class="nav nav-pills">
   <li class="{{#if_eq subpage compare="show"}}active{{/if_eq}}">
-    <a href="{{base}}/samples/{{escape sample.uri}}"><i class="icon-file"></i> Details</a>
+    <a href="{{base}}/samples/{{escape sample.uri}}"><i class="icon-file"></i> Sample</a>
   </li>
   <li class="{{#if_eq subpage compare="variations"}}active{{/if_eq}}">
     <a href="{{base}}/samples/{{escape sample.uri}}/variations"><i class="icon-th-large"></i> Variation</a>

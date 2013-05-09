@@ -1,4 +1,4 @@
-{{#title}}Data source: {{data_source.name}}{{/title}}
+{{#title}}{{data_source.name}}{{/title}}
 
 <p>Name: {{data_source.name}}</p>
 <p>Added: {{dateFormat data_source.added}}</p>

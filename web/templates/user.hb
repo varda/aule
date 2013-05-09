@@ -1,4 +1,4 @@
-{{#title}}User: {{user.name}}{{/title}}
+{{#title}}{{user.name}}{{/title}}
 
 <p>Name: {{user.name}}</p>
 <p>Added: {{dateFormat user.added}}</p>

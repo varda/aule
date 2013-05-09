@@ -90,6 +90,7 @@ define ['jquery',
                 options.inverse @
         Handlebars.registerHelper 'title', (options) ->
             $('h1').html options.fn @
+            $('title').html 'Aule - ' + options.fn @
             return
         Handlebars.registerHelper 'query', (path, options) ->
             $.param $.extend (parseQueryString path), options.hash
