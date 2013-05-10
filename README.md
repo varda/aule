@@ -25,6 +25,9 @@ The HTML5 layout is based on Twitter's
 stylesheets. [Font Awesome](http://fortawesome.github.io/Font-Awesome/) is
 used for icons.
 
+Eh, yeah, this means a somewhat modern browser is needed. Tested with Chrome
+26 and Firefox 10, both on Linux.
+
 
 Installation and configuration
 ------------------------------
