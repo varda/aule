@@ -163,8 +163,46 @@ define ['jquery',
         @get '/data_sources/:data_source', ->
             @app.api.data_source @params.data_source,
                 success: (data_source) =>
-                    @show 'data_source', data_source: data_source
+                    @show 'data_source', {data_source: data_source}, {subpage: 'show'}
                 error: (code, message) => @error message
+
+        # Edit data source form.
+        @get '/data_sources/:data_source/edit', ->
+            @app.api.data_source @params.data_source,
+                success: (data_source) =>
+                    @show 'data_source', {data_source: data_source}, {subpage: 'edit'}
+                error: (code, message) => @error message
+
+        # Edit data source.
+        @post '/data_sources/:data_source/edit', ->
+            if not @params.dirty
+                @error 'Data source is unchanged'
+                return
+            params = {}
+            for field in @params.dirty.split ','
+                params[field] = @params[field]
+            @app.api.edit_data_source @params.data_source,
+                data: params
+                success: (data_source) =>
+                    location = config.RESOURCES_PREFIX + '/data_sources/'
+                    location += (encodeURIComponent data_source.uri)
+                    @redirect location
+                    @success "Saved data source '#{@params.name}'"
+                error: (code, message) => @error message
+            return
+
+        # Delete data_source form.
+        @get '/data_sources/:data_source/delete', ->
+            @app.api.data_source @params.data_source,
+                success: (data_source) =>
+                    @show 'data_source', {data_source: data_source}, {subpage: 'delete'}
+                error: (code, message) => @error message
+
+        # Delete data source.
+        @post '/data_sources/:data_source/delete', ->
+            # Todo: Delete data source.
+            @error 'Deleting a data source is not implemented'
+            return
 
         # Add data source form.
         @get '/data_sources_add', ->
@@ -248,16 +286,22 @@ define ['jquery',
                     location = config.RESOURCES_PREFIX + '/samples/'
                     location += (encodeURIComponent sample.uri)
                     @redirect location
-                    @success "Edited sample '#{@params.name}'"
+                    @success "Saved sample '#{@params.name}'"
                 error: (code, message) => @error message
             return
 
-        # Delete sample.
+        # Delete sample form.
         @get '/samples/:sample/delete', ->
             @app.api.sample @params.sample,
                 success: (sample) =>
                     @show 'sample', {sample: sample}, {subpage: 'delete'}
                 error: (code, message) => @error message
+
+        # Delete sample.
+        @post '/samples/:sample/delete', ->
+            # Todo: Delete sample.
+            @error 'Deleting a sample is not implemented'
+            return
 
         # Sample variations.
         @get '/samples/:sample/variations', ->
@@ -302,8 +346,48 @@ define ['jquery',
         @get '/users/:user', ->
             @app.api.user @params.user,
                 success: (user) =>
-                    @show 'user', user: user
+                    @show 'user', {user: user}, {subpage: 'show'}
                 error: (code, message) => @error message
+
+        # Edit user form.
+        @get '/users/:user/edit', ->
+            @app.api.user @params.user,
+                success: (user) =>
+                    @show 'user', {user: user}, {subpage: 'edit'}
+                error: (code, message) => @error message
+
+        # Edit user.
+        @post '/users/:user/edit', ->
+            if not @params.dirty
+                @error 'User is unchanged'
+                return
+            params = {}
+            # Todo: Check password repeat.
+            # Todo: More user-friendly way of setting roles.
+            for field in @params.dirty.split ','
+                params[field] = @params[field]
+            @app.api.edit_user @params.user,
+                data: params
+                success: (user) =>
+                    location = config.RESOURCES_PREFIX + '/users/'
+                    location += (encodeURIComponent user.uri)
+                    @redirect location
+                    @success "Saved user '#{@params.name}'"
+                error: (code, message) => @error message
+            return
+
+        # Delete user form.
+        @get '/users/:user/delete', ->
+            @app.api.user @params.user,
+                success: (user) =>
+                    @show 'user', {user: user}, {subpage: 'delete'}
+                error: (code, message) => @error message
+
+        # Delete user.
+        @post '/users/:user/delete', ->
+            # Todo: Delete user.
+            @error 'Deleting a user is not implemented'
+            return
 
         # Add user form.
         @get '/users_add', ->
@@ -311,6 +395,8 @@ define ['jquery',
 
         # Add user.
         @post '/users', ->
+            # Todo: Check password repeat.
+            # Todo: More user-friendly way of setting roles.
             @app.api.create_user
                 data:
                     name: @params.name

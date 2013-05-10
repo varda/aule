@@ -1,6 +1,6 @@
 <form action="{{base}}/data_sources" method="post">
   <fieldset>
-    <label for="name">Name</label>
+    <label for="name">Data source name</label>
     <input type="text" class="input-xlarge" name="name" id="name">
     <label for="filetype">Filetype</label>
     <select class="medium" name="filetype" id="filetype">

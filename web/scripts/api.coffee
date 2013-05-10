@@ -7,6 +7,9 @@
 # Licensed under the MIT license, see the LICENSE file.
 
 
+# Todo: Cache resources.
+
+
 define ['jquery', 'jquery.base64'], ($) ->
 
     # Accepted server API versions.
@@ -102,6 +105,12 @@ define ['jquery', 'jquery.base64'], ($) ->
             options.method = 'POST'
             @request @uris.data_sources, options
 
+        edit_data_source: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.data_source
+            options.method = 'PATCH'
+            @request uri, options
+
         sample: (uri, options={}) =>
             success = options.success
             options.success = (data) -> success? data.sample
@@ -140,6 +149,12 @@ define ['jquery', 'jquery.base64'], ($) ->
             options.success = (data) -> success? data.user
             options.method = 'POST'
             @request @uris.users, options
+
+        edit_user: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.user
+            options.method = 'PATCH'
+            @request uri, options
 
         variations: (options={}) =>
             uri = @uris.variations + '?embed=data_source'

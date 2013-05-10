@@ -15,7 +15,7 @@
       <input type="checkbox" name="public"{{#if sample.public}} checked{{/if}}> Public
     </label>
     <div class="form-actions">
-      <button type="submit" class="btn btn-warning"><i class="icon-pencil"></i> Edit sample</button>
+      <button type="submit" class="btn btn-warning"><i class="icon-pencil"></i> Save changes</button>
       <button type="reset" class="btn">Reset</button>
     </div>
   </fieldset>

@@ -1,6 +1,6 @@
 <form action="{{base}}/users" method="post">
   <fieldset>
-    <label for="name">Name</label>
+    <label for="name">User name</label>
     <input type="text" name="name" id="name">
     <label for="login">Login</label>
     <input type="text" name="login" id="login">
