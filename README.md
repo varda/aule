@@ -76,9 +76,8 @@ Todo
 * [Implement Cross-origin resource sharing](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
   (CORS) to enable serving Aulë and Varda from different sites.
 * Get rid of the hard-coded absolute paths (starting with `/aule`) in
-  `web/index.html`. This is tricky, since the path of the request may contain
-  any number of directory levels.
-* Use git submodules for more of the vendor JavaScript modules.
+  `web/index.html`. This is tricky, since the request location may contain any
+  number of `/` characters.
 * Pre-compile Less, CoffeeScript, and Handlebars files, and use minified
   versions of JavaScript files.
 
