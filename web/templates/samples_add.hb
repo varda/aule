@@ -13,6 +13,8 @@
     <label class="checkbox">
       <input type="checkbox" name="public"> Public
     </label>
+    <label for="notes">Notes</label>
+    <textarea class="input-xlarge" name="notes" id="notes"></textarea>
     <div class="form-actions">
       <button type="submit" class="btn btn-success"><i class="icon-plus"></i> Add sample</button>
       <button type="reset" class="btn">Reset</button>
