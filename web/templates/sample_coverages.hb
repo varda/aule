@@ -6,7 +6,21 @@
       {{#each coverages}}
       <tr>
         <td>{{data_source.name}}</td>
-        <td>{{#if imported}}<i class="icon-ok"></i>{{/if}}</td>
+        <td>
+{{#if task.done}}
+  <i class="icon-ok"></i>
+{{else}}
+  {{#if_eq task.state compare="failure"}}
+    <i class="icon-warning-sign" title="{{task.error.message}}"></i>
+  {{/if_eq}}
+  {{#if_eq task.state compare="started"}}
+    <i class="icon-spinner></i>
+  {{/if_eq}}
+  {{#if_eq task.state compare="progress"}}
+    <i class="icon-spinner" title="{{task.progress}}"></i>
+  {{/if_eq}}
+{{/if}}
+        </td>
       </tr>
       {{/each}}
     </tbody>
