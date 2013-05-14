@@ -167,6 +167,16 @@ define ['jquery', 'jquery.base64'], ($) ->
             options.success = (data) -> success? data.variant
             @request uri, options
 
+        variants: (options={}) =>
+            uri = @uris.variants
+            region = "chromosome:#{ options.region.chromosome }"
+            region += ",begin:#{ options.region.begin }"
+            region += ",end:#{ options.region.end }"
+            uri += "?region=#{ encodeURIComponent region }"
+            if options.sample
+                uri += "&sample=#{ encodeURIComponent options.sample }"
+            @collection uri, options
+
         create_variant: (options={}) =>
             success = options.success
             options.success = (data) -> success? data.variant
@@ -190,6 +200,7 @@ define ['jquery', 'jquery.base64'], ($) ->
                         options.success? [], total: 0, current: 0
                     else
                         options.error? code, message
+                data: options.data
 
         request: (uri, options={}) =>
             $.ajax uri,

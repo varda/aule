@@ -1,4 +1,4 @@
-<form action="{{base}}/variants_region" method="post">
+<form action="{{base}}/variants" method="get">
   <fieldset>
     <label for="sample">Sample</label>
     <select class="medium" name="sample" id="sample">
@@ -7,8 +7,10 @@
         <option value="{{uri}}">{{name}}</option>
       {{/each}}
     </select>
-    <label for="start">Region start</label>
-    <input type="text" name="start" id="start">
+    <label for="chromosome">Chromosome name</label>
+    <input type="text" name="chromosome" id="chromosome">
+    <label for="begin">Region begin</label>
+    <input type="text" name="begin" id="begin">
     <label for="start">Region end</label>
     <input type="text" name="end" id="end">
     <div class="form-actions">

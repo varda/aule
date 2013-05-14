@@ -1,4 +1,4 @@
-<form action="{{base}}/variants_variant" method="post">
+<form action="{{base}}/lookup_variant" method="post">
   <fieldset>
     <label for="sample">Sample</label>
     <select class="medium" name="sample" id="sample">

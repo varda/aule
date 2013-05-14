@@ -223,6 +223,41 @@ define ['jquery',
                 error: (code, message) => @error message
             return
 
+        # Lookup variant form.
+        @get '/lookup_variant', ->
+            # Todo: Due to pagination, this might not give all public samples.
+            @app.api.samples
+                filter: 'public'
+                success: (items, pagination) =>
+                    @show 'lookup', {samples: items}, {subpage: 'variant'}
+                error: (code, message) => @error message
+
+        # Lookup variant.
+        @post '/lookup_variant', ->
+            @app.api.create_variant
+                data:
+                    chromosome: @params.chromosome
+                    position: @params.position
+                    reference: @params.reference
+                    observed: @params.observed
+                success: (variant) =>
+                    location = config.RESOURCES_PREFIX + '/variants/'
+                    location += (encodeURIComponent variant.uri)
+                    if @params.sample
+                        location += '?sample=' + (encodeURIComponent @params.sample)
+                    @redirect location
+                error: (code, message) => @error message
+            return
+
+        # Lookup variants form.
+        @get '/lookup_region', ->
+            # Todo: Due to pagination, this might not give all public samples.
+            @app.api.samples
+                filter: 'public'
+                success: (items, pagination) =>
+                    @show 'lookup', {samples: items}, {subpage: 'region'}
+                error: (code, message) => @error message
+
         # List samples.
         @get '/samples', ->
             @app.api.samples
@@ -411,24 +446,6 @@ define ['jquery',
                 error: (code, message) => @error message
             return
 
-        # Lookup variant form.
-        @get '/variants_variant', ->
-            # Todo: Due to pagination, this might not give all public samples.
-            @app.api.samples
-                filter: 'public'
-                success: (items, pagination) =>
-                    @show 'variants', {samples: items}, {subpage: 'variant'}
-                error: (code, message) => @error message
-
-        # Lookup variants form.
-        @get '/variants_region', ->
-            # Todo: Due to pagination, this might not give all public samples.
-            @app.api.samples
-                filter: 'public'
-                success: (items, pagination) =>
-                    @show 'variants', {samples: items}, {subpage: 'region'}
-                error: (code, message) => @error message
-
         # Show variant.
         @get '/variants/:variant', ->
             data = {}
@@ -438,19 +455,17 @@ define ['jquery',
                 success: (variant) => @show 'variant', {variant: variant}
                 error: (code, message) => @error message
 
-        # Lookup variant.
-        @post '/variants_variant', ->
-            @app.api.create_variant
-                data:
+        # List variants.
+        @get '/variants', ->
+            @app.api.variants
+                sample: @params.sample
+                region:
                     chromosome: @params.chromosome
-                    position: @params.position
-                    reference: @params.reference
-                    observed: @params.observed
-                success: (variant) =>
-                    location = config.RESOURCES_PREFIX + '/variants/'
-                    location += (encodeURIComponent variant.uri)
-                    if @params.sample
-                        location += '?sample=' + (encodeURIComponent @params.sample)
-                    @redirect location
+                    begin: @params.begin
+                    end: @params.end
+                page_number: parseInt @params.page ? 0
+                success: (items, pagination) =>
+                    @show 'variants',
+                        {variants: items},
+                        {pagination: pagination}
                 error: (code, message) => @error message
-            return

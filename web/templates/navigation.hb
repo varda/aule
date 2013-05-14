@@ -22,7 +22,7 @@
       <li><a href="{{base}}/users">All users</a></li>
     {{/if}}
     <li class="nav-header">Variants</li>
-    <li><a href="{{base}}/variants_variant">Lookup variant</a></li>
-    <li><a href="{{base}}/variants_region">Lookup region</a></li>
+    <li><a href="{{base}}/lookup_variant">Lookup variant</a></li>
+    <li><a href="{{base}}/lookup_region">Lookup region</a></li>
   </ul>
 </div>
