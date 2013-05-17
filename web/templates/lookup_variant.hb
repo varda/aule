@@ -16,7 +16,7 @@
     <label for="observed">Observed sequence</label>
     <input type="text" name="observed" id="observed">
     <div class="form-actions">
-      <button type="submit" class="btn btn-success"><i class="icon-plus"></i> Lookup variant</button>
+      <button type="submit" class="btn btn-info"><i class="icon-info"></i> Lookup variant</button>
       <button type="reset" class="btn">Reset</button>
     </div>
   </fieldset>
