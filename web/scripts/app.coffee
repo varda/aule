@@ -369,6 +369,86 @@ define ['jquery',
                         error: (code, message) => @error message
                 error: (code, message) => @error message
 
+        # List tokens.
+        @get '/tokens', ->
+            if not @app.api.current_user?
+                @error 'Cannot list API tokens if not authenticated'
+                return
+            @app.api.tokens
+                filter: 'own'
+                page_number: parseInt @params.page ? 0
+                success: (items, pagination) =>
+                    @show 'tokens',
+                        {tokens: items},
+                        {subpage: 'list', pagination: pagination}
+                error: (code, message) => @error message
+
+        # Add token form.
+        @get '/tokens_add', ->
+            @show 'tokens', {}, {subpage: 'add'}
+
+        # Add token.
+        @post '/tokens', ->
+            if not @app.api.current_user?
+                @error 'Cannot generate API tokens if not authenticated'
+                return
+            @app.api.create_token
+                data:
+                    user: @app.api.current_user.uri
+                    name: @params.name
+                success: (token) =>
+                    location = config.RESOURCES_PREFIX + '/tokens/'
+                    location += (encodeURIComponent token.uri)
+                    @redirect location
+                    @success "Generated API token '#{@params.name}'"
+                error: (code, message) => @error message
+            return
+
+        # Show token.
+        @get '/tokens/:token', ->
+            @app.api.token @params.token,
+                success: (token) =>
+                    @show 'token', {token: token}, {subpage: 'show'}
+                error: (code, message) => @error message
+
+        # Edit token form.
+        @get '/tokens/:token/edit', ->
+            @app.api.token @params.token,
+                success: (token) =>
+                    @show 'token', {token: token}, {subpage: 'edit'}
+                error: (code, message) => @error message
+
+        # Edit token.
+        @post '/tokens/:token/edit', ->
+            if not @params.dirty
+                @error 'Token is unchanged'
+                return
+            params = {}
+            for field in @params.dirty.split ','
+                params[field] = @params[field]
+            @app.api.edit_token @params.token,
+                data: params
+                success: (token) =>
+                    location = config.RESOURCES_PREFIX + '/tokens/'
+                    location += (encodeURIComponent token.uri)
+                    @redirect location
+                    @success "Saved token '#{@params.name}'"
+                error: (code, message) => @error message
+            return
+
+        # Delete token form.
+        @get '/tokens/:token/delete', ->
+            @app.api.token @params.token,
+                success: (token) =>
+                    @show 'token', {token: token}, {subpage: 'delete'}
+                error: (code, message) => @error message
+
+        # Delete token.
+        @post '/tokens/:token/delete', ->
+            # Todo: Delete token.
+            @error 'Revoking an API token is not implemented'
+            return
+
         # List users.
         @get '/users', ->
             @app.api.users

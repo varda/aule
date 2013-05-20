@@ -65,6 +65,7 @@ define ['jquery', 'jquery.base64'], ($) ->
                         coverages: r.coverage_collection.uri
                         data_sources: r.data_source_collection.uri
                         samples: r.sample_collection.uri
+                        tokens: r.token_collection.uri
                         users: r.user_collection.uri
                         variants: r.variant_collection.uri
                         variations: r.variation_collection.uri
@@ -133,6 +134,29 @@ define ['jquery', 'jquery.base64'], ($) ->
         edit_sample: (uri, options={}) =>
             success = options.success
             options.success = (data) -> success? data.sample
+            options.method = 'PATCH'
+            @request uri, options
+
+        token: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.token
+            @request uri, options
+
+        tokens: (options={}) =>
+            uri = @uris.tokens
+            if options.filter == 'own'
+                uri += "?user=#{ encodeURIComponent @current_user?.uri }"
+            @collection uri, options
+
+        create_token: (options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.token
+            options.method = 'POST'
+            @request @uris.tokens, options
+
+        edit_token: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.token
             options.method = 'PATCH'
             @request uri, options
 
