@@ -7,6 +7,9 @@
 # Licensed under the MIT license, see the LICENSE file.
 
 
+# Todo: Figure out roles and rights for variant lookup.
+
+
 define ['jquery',
         'cs!config',
         'sammy',
