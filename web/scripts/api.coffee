@@ -90,6 +90,7 @@ define ['jquery', 'jquery.base64'], ($) ->
             @collection uri, options
 
         data_source: (uri, options={}) =>
+            uri += '?embed=user'  # Todo: Proper URI construction.
             success = options.success
             options.success = (data) -> success? data.data_source
             @request uri, options
@@ -113,6 +114,7 @@ define ['jquery', 'jquery.base64'], ($) ->
             @request uri, options
 
         sample: (uri, options={}) =>
+            uri += '?embed=user'  # Todo: Proper URI construction.
             success = options.success
             options.success = (data) -> success? data.sample
             @request uri, options
