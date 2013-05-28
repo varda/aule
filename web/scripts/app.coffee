@@ -99,6 +99,8 @@ define ['jquery',
             $.param $.extend (parseQueryString path), options.hash
         Handlebars.registerHelper 'dateFormat', (date, options) ->
             moment(date).format options.hash.format ? 'MMM Do, YYYY'
+        Handlebars.registerHelper 'numberFormat', (number, options) ->
+            number.toFixed options.hash.decimals ? 2
 
         # Get location for template.
         @helper 'template', (name) ->
@@ -549,6 +551,6 @@ define ['jquery',
                 page_number: parseInt @params.page ? 0
                 success: (items, pagination) =>
                     @show 'variants',
-                        {variants: items},
+                        {variants: items, sample: {uri: @params.sample}},
                         {pagination: pagination}
                 error: (code, message) => @error message

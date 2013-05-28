@@ -14,7 +14,7 @@
   <dt>Coverage</dt>
   <dd>{{variant.coverage}} individuals</dd>
   <dt>Frequency</dt>
-  <dd>{{variant.frequency}} ({{variant.frequency_het}} heterozygous, {{variant.frequency_hom}} homozygous)</dd>
+  <dd>{{numberFormat variant.frequency decimals=4}} ({{numberFormat variant.frequency_het decimals=4}} heterozygous, {{numberFormat variant.frequency_hom decimals=4}} homozygous)</dd>
   <dt>URI</dt>
   <dd>{{variant.uri}}</dd>
 </dl>

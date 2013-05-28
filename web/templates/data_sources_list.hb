@@ -1,12 +1,13 @@
 {{#if data_sources}}
   {{> pagination}}
   <table class="table table-hover">
-    <thead><tr><th>Added</th><th>Name</th></tr></thead>
+    <thead><tr><th>Name</th><th>Filetype</th><th>Added</th></tr></thead>
     <tbody>
       {{#each data_sources}}
       <tr data-href="{{../base}}/data_sources/{{escape uri}}">
-        <td>{{dateFormat added}}</td>
         <td>{{name}}</td>
+        <td>{{filetype}}</td>
+        <td>{{dateFormat added}}</td>
       </tr>
       {{/each}}
     </tbody>

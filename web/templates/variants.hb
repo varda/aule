@@ -3,16 +3,16 @@
 {{#if variants}}
   {{> pagination}}
   <table class="table table-hover">
-    <thead><tr><th>Chromosome</th><th>Position</th><th>Reference</th><th>Observed</th><th>Frequency</th><th>N</th></tr></thead>
+    <thead><tr><th>Chromosome</th><th class="cell-numeric">Position</th><th>Reference</th><th>Observed</th><th class="cell-numeric">Frequency</th><th class="cell-numeric">N</th></tr></thead>
     <tbody>
       {{#each variants}}
-      <tr data-href="{{../base}}/variants/{{escape uri}}">
+      <tr data-href="{{../base}}/variants/{{escape uri}}?sample={{escape ../sample.uri}}">
         <td>{{chromosome}}</td>
-        <td>{{position}}</td>
+        <td class="cell-numeric">{{position}}</td>
         <td>{{reference}}</td>
         <td>{{observed}}</td>
-        <td>{{frequency}}</td>
-        <td>{{coverage}}</td>
+        <td class="cell-numeric">{{numberFormat frequency decimals=4}}</td>
+        <td class="cell-numeric">{{coverage}}</td>
       </tr>
       {{/each}}
     </tbody>

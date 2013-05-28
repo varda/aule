@@ -3,7 +3,7 @@
     <label for="name">Data source name</label>
     <input type="text" class="input-xlarge" name="name" id="name">
     <label for="filetype">Filetype</label>
-    <select class="medium" name="filetype" id="filetype">
+    <select class="input-medium" name="filetype" id="filetype">
       <option>vcf</option>
       <option>bed</option>
     </select>

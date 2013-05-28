@@ -14,8 +14,8 @@
     <label class="checkbox">
       <input type="checkbox" name="public"{{#if sample.public}} checked{{/if}}> Public
     </label>
-    <label for="notes">Notes</label>
-    <textarea class="input-xlarge" name="notes" id="notes">{{sample.notes}}</textarea>
+    <label for="notes">Notes (you can use <a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a>)</label>
+    <textarea class="input-xxlarge" rows="10" name="notes" id="notes">{{sample.notes}}</textarea>
     <div class="form-actions">
       <button type="submit" class="btn btn-warning"><i class="icon-pencil"></i> Save changes</button>
       <button type="reset" class="btn">Reset</button>

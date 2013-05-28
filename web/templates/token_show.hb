@@ -11,7 +11,7 @@
   <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#token-view"><i class="icon-lock"></i> Show token</button>
 </p>
 
-<div id="token-view" class="modal hide fade">
+<div id="token-view" class="modal hide">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3>{{token.name}}</h3>

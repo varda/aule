@@ -1,12 +1,12 @@
 {{#if variations}}
   {{> pagination}}
   <table class="table table-hover">
-    <thead><tr><th>Data source</th><th>Imported</th></tr></thead>
+    <thead><tr><th>Data source</th><th class="cell-icon">Imported</th></tr></thead>
     <tbody>
       {{#each variations}}
       <tr>
         <td>{{data_source.name}}</td>
-        <td>
+        <td class="cell-icon">
 {{#if task.done}}
   <i class="icon-ok"></i>
 {{else}}
