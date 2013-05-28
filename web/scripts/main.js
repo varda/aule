@@ -35,6 +35,7 @@ require({
         'jquery': 'vendor/jquery',
         'jquery.base64': 'vendor/jquery.base64',
         'less': 'vendor/less',
+        'marked': 'vendor/marked',
         'moment': 'vendor/moment',
         'sammy': '../sammy/sammy',
         'sammy.handlebars': '../sammy/plugins/sammy.handlebars'
