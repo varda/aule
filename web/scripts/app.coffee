@@ -423,7 +423,7 @@ define ['jquery',
         # Edit token.
         @post '/tokens/:token/edit', ->
             if not @params.dirty
-                @error 'Token is unchanged'
+                @error 'API token is unchanged'
                 return
             params = {}
             for field in @params.dirty.split ','
@@ -434,7 +434,7 @@ define ['jquery',
                     location = config.RESOURCES_PREFIX + '/tokens/'
                     location += (encodeURIComponent token.uri)
                     @redirect location
-                    @success "Saved token '#{@params.name}'"
+                    @success "Saved API token '#{@params.name}'"
                 error: (code, message) => @error message
             return
 
@@ -447,8 +447,11 @@ define ['jquery',
 
         # Delete token.
         @post '/tokens/:token/delete', ->
-            # Todo: Delete token.
-            @error 'Revoking an API token is not implemented'
+            @app.api.delete_token @params.token,
+                success: =>
+                    @redirect config.RESOURCES_PREFIX + '/tokens'
+                    @success "Revoked API token '#{@params.name}'"
+                error: (code, message) => @error message
             return
 
         # List users.
@@ -505,8 +508,11 @@ define ['jquery',
 
         # Delete user.
         @post '/users/:user/delete', ->
-            # Todo: Delete user.
-            @error 'Deleting a user is not implemented'
+            @app.api.delete_user @params.user,
+                success: =>
+                    @redirect config.RESOURCES_PREFIX + '/users'
+                    @success "Deleted user '#{@params.name}'"
+                error: (code, message) => @error message
             return
 
         # Add user form.

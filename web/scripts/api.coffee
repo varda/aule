@@ -13,7 +13,7 @@
 define ['jquery', 'jquery.base64'], ($) ->
 
     # Accepted server API versions.
-    ACCEPT_VERSION = '>=0.2.0,<0.3.0'
+    ACCEPT_VERSION = '>=0.2.1,<0.3.0'
 
     # Create HTTP Basic Authentication header value.
     makeBasicAuth = (login, password) ->
@@ -162,6 +162,12 @@ define ['jquery', 'jquery.base64'], ($) ->
             options.method = 'PATCH'
             @request uri, options
 
+        delete_token: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success?()
+            options.method = 'DELETE'
+            @request uri, options
+
         user: (uri, options={}) =>
             success = options.success
             options.success = (data) -> success? data.user
@@ -180,6 +186,12 @@ define ['jquery', 'jquery.base64'], ($) ->
             success = options.success
             options.success = (data) -> success? data.user
             options.method = 'PATCH'
+            @request uri, options
+
+        delete_user: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success?()
+            options.method = 'DELETE'
             @request uri, options
 
         variations: (options={}) =>
