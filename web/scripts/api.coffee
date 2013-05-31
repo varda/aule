@@ -52,7 +52,7 @@ define ['jquery', 'jquery.base64'], ($) ->
 
         init: ({success, error}) =>
             @request @root,
-                error: -> error? 'connection_error', 'Could not connect to server'
+                error: error
                 success: (r) =>
                     if r.status != 'ok'
                         error? 'response_error', 'Unexpected response from server'
@@ -113,6 +113,12 @@ define ['jquery', 'jquery.base64'], ($) ->
             options.method = 'PATCH'
             @request uri, options
 
+        delete_data_source: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success?()
+            options.method = 'DELETE'
+            @request uri, options
+
         sample: (uri, options={}) =>
             uri += '?embed=user'  # Todo: Proper URI construction.
             success = options.success
@@ -137,6 +143,12 @@ define ['jquery', 'jquery.base64'], ($) ->
             success = options.success
             options.success = (data) -> success? data.sample
             options.method = 'PATCH'
+            @request uri, options
+
+        delete_sample: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success?()
+            options.method = 'DELETE'
             @request uri, options
 
         token: (uri, options={}) =>

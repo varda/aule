@@ -205,8 +205,11 @@ define ['jquery',
 
         # Delete data source.
         @post '/data_sources/:data_source/delete', ->
-            # Todo: Delete data source.
-            @error 'Deleting a data source is not implemented'
+            @app.api.delete_data_source @params.data_source,
+                success: =>
+                    @redirect config.RESOURCES_PREFIX + '/data_sources'
+                    @success "Deleted data source '#{@params.name}'"
+                error: (code, message) => @error message
             return
 
         # Add data source form.
@@ -339,8 +342,11 @@ define ['jquery',
 
         # Delete sample.
         @post '/samples/:sample/delete', ->
-            # Todo: Delete sample.
-            @error 'Deleting a sample is not implemented'
+            @app.api.delete_sample @params.sample,
+                success: =>
+                    @redirect config.RESOURCES_PREFIX + '/sample'
+                    @success "Deleted sample '#{@params.name}'"
+                error: (code, message) => @error message
             return
 
         # Sample variations.
