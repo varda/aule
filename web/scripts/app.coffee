@@ -344,6 +344,7 @@ define ['jquery',
         @post '/samples/:sample/delete', ->
             @app.api.delete_sample @params.sample,
                 success: =>
+                    # Todo: Redirect page might be forbidden for this user.
                     @redirect config.RESOURCES_PREFIX + '/samples'
                     @success "Deleted sample '#{@params.name}'"
                 error: (code, message) => @error message

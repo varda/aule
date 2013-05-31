@@ -14,10 +14,12 @@
     <i class="icon-warning-sign" title="{{task.error.message}}"></i>
   {{/if_eq}}
   {{#if_eq task.state compare="started"}}
-    <i class="icon-spinner></i>
+    <i class="icon-spinner icon-spin"></i>
   {{/if_eq}}
   {{#if_eq task.state compare="progress"}}
-    <i class="icon-spinner" title="{{task.progress}}"></i>
+    <div class="progress">
+      <div class="bar" style="width: {{task.progress}}%;" title="{{task.progress}}%"></div>
+    </div>
   {{/if_eq}}
 {{/if}}
         </td>
