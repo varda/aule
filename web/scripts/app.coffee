@@ -344,7 +344,7 @@ define ['jquery',
         @post '/samples/:sample/delete', ->
             @app.api.delete_sample @params.sample,
                 success: =>
-                    @redirect config.RESOURCES_PREFIX + '/sample'
+                    @redirect config.RESOURCES_PREFIX + '/samples'
                     @success "Deleted sample '#{@params.name}'"
                 error: (code, message) => @error message
             return
