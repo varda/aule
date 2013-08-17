@@ -483,6 +483,11 @@ define ['jquery',
         @get '/users/:user/edit', ->
             @app.api.user @params.user,
                 success: (user) =>
+                    user.roles =
+                        admin: 'admin' in user.roles
+                        importer: 'importer' in user.roles
+                        annotator: 'annotator' in user.roles
+                        trader: 'trader' in user.roles
                     @show 'user', {user: user}, {subpage: 'edit'}
                 error: (code, message) => @error message
 
@@ -491,11 +496,20 @@ define ['jquery',
             if not @params.dirty
                 @error 'User is unchanged'
                 return
+            if @params.password isnt @params.password_check
+                @error "Password repeat doesn't match"
+                return
             params = {}
-            # Todo: Check password repeat.
-            # Todo: More user-friendly way of setting roles.
             for field in @params.dirty.split ','
-                params[field] = @params[field]
+                if field is 'password_check'
+                    continue
+                if field is 'roles'
+                    if @params[field]?.join?
+                        params[field] = @params[field].join ','
+                    else
+                        params[field] = @params[field] ? ''
+                else
+                    params[field] = @params[field]
             @app.api.edit_user @params.user,
                 data: params
                 success: (user) =>
@@ -528,14 +542,19 @@ define ['jquery',
 
         # Add user.
         @post '/users', ->
-            # Todo: Check password repeat.
-            # Todo: More user-friendly way of setting roles.
+            if @params.password isnt @params.password_check
+                @error "Password repeat doesn't match"
+                return
+            if @params.roles?.join?
+                roles = @params.roles.join ','
+            else
+                roles = @params.roles ? ''
             @app.api.create_user
                 data:
                     name: @params.name
                     login: @params.login
                     password: @params.password
-                    roles: @params.roles
+                    roles: roles
                 success: (user) =>
                     location = config.RESOURCES_PREFIX + '/users/'
                     location += (encodeURIComponent user.uri)
