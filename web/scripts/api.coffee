@@ -119,6 +119,11 @@ define ['jquery', 'jquery.base64'], ($) ->
             options.method = 'DELETE'
             @request uri, options
 
+        genome: (options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.genome
+            @request @uris.genome, options
+
         sample: (uri, options={}) =>
             uri += '?embed=user'  # Todo: Proper URI construction.
             success = options.success

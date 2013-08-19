@@ -7,8 +7,12 @@
         <option value="{{uri}}">{{name}}</option>
       {{/each}}
     </select>
-    <label for="chromosome">Chromosome name</label>
-    <input type="text" class="input-medium" name="chromosome" id="chromosome">
+    <label for="chromosome">Chromosome</label>
+    <select class="input-xlarge" name="chromosome" id="chromosome">
+      {{#each chromosomes}}
+        <option value="{{this}}">{{this}}</option>
+      {{/each}}
+    </select>
     <label for="position">Position</label>
     <input type="text" class="input-medium" name="position" id="position">
     <label for="reference">Reference sequence</label>

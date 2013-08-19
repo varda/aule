@@ -233,11 +233,17 @@ define ['jquery',
 
         # Lookup variant form.
         @get '/lookup_variant', ->
+            # Todo: Instead of the ugly nesting of these request callbacks, we
+            #     should jQuery deferred objects or a similar pattern.
+            #     For example, see: http://api.jquery.com/jQuery.when/
             # Todo: Due to pagination, this might not give all public samples.
             @app.api.samples
                 filter: 'public'
                 success: (items, pagination) =>
-                    @show 'lookup', {samples: items}, {subpage: 'variant'}
+                    @app.api.genome
+                        success: (genome) =>
+                            @show 'lookup', {samples: items, chromosomes: genome.chromosomes}, {subpage: 'variant'}
+                        error: (code, message) => @error message
                 error: (code, message) => @error message
 
         # Lookup variant.
@@ -263,7 +269,10 @@ define ['jquery',
             @app.api.samples
                 filter: 'public'
                 success: (items, pagination) =>
-                    @show 'lookup', {samples: items}, {subpage: 'region'}
+                    @app.api.genome
+                        success: (genome) =>
+                            @show 'lookup', {samples: items, chromosomes: genome.chromosomes}, {subpage: 'region'}
+                        error: (code, message) => @error message
                 error: (code, message) => @error message
 
         # List samples.
