@@ -1,11 +1,11 @@
-{{#if variations}}
+{{#if annotations}}
   {{> pagination}}
   <table class="table table-hover">
-    <thead><tr><th>Data source</th><th class="cell-icon">Imported</th></tr></thead>
+    <thead><tr><th>Annotation</th><th class="cell-icon">Written</th></tr></thead>
     <tbody>
-      {{#each variations}}
-      <tr>
-        <td>{{data_source.name}}</td>
+      {{#each annotations}}
+      <tr data-href="{{../base}}/annotations/{{escape uri}}">
+        <td>{{annotated_data_source.name}}</td>
         <td class="cell-icon">
 {{#if task.done}}
   <i class="icon-ok"></i>
@@ -29,5 +29,5 @@
   </table>
   {{> pagination}}
 {{else}}
-  <p>No observations are here.</p>
+  <p>No annotations are here.</p>
 {{/if}}

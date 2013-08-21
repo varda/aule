@@ -171,6 +171,64 @@ define ['jquery',
                     @show 'data_source', {data_source: data_source}, {subpage: 'show'}
                 error: (code, message) => @error message
 
+        # List data source annotations.
+        @get '/data_sources/:data_source/annotations', ->
+            @app.api.data_source @params.data_source,
+                success: (data_source) =>
+                    @app.api.annotations
+                        original_data_source: @params.data_source
+                        page_number: parseInt @params.page ? 0
+                        success: (items, pagination) =>
+                            @show 'data_source',
+                                {data_source: data_source, annotations: items},
+                                {subpage: 'annotations', pagination: pagination}
+                        error: (code, message) => @error message
+                error: (code, message) => @error message
+
+        # Show annotation.
+        @get '/annotations/:annotation', ->
+            @app.api.annotation @params.annotation,
+                success: (annotation) =>
+                    @show 'annotation', {annotation: annotation}, {subpage: 'show'}
+                error: (code, message) => @error message
+
+        # Add annotation form.
+        @get '/data_sources/:data_source/annotations_add', ->
+            @app.api.data_source @params.data_source,
+                success: (data_source) =>
+                    # Todo: We currently only show public samples, but in it
+                    #     should also be possible to select any of your own
+                    #     samples.
+                    @app.api.samples
+                        filter: 'public'
+                        success: (items, pagination) =>
+                            @show 'data_source',
+                                {data_source: data_source, samples: items},
+                                {subpage: 'annotations_add'}
+                        error: (code, message) => @error message
+                error: (code, message) => @error message
+
+        # Add annotation.
+        @post '/data_sources/:data_source/annotations', ->
+            if @params.sample_frequency?.join?
+                sample_frequency = @params.sample_frequency.join ','
+            else
+                sample_frequency = @params.sample_frequency ? ''
+            @app.api.create_annotation
+                data:
+                    name: @params.name
+                    data_source: @params.data_source
+                    global_frequency: @params.global_frequency?
+                    sample_frequency: sample_frequency
+                success: (annotation) =>
+                    console.log annotation
+                    location = config.RESOURCES_PREFIX + '/annotations/'
+                    location += (encodeURIComponent annotation.uri)
+                    @redirect location
+                    @success "Added annotation '#{@params.name}'"
+                error: (code, message) => @error message
+            return
+
         # Edit data source form.
         @get '/data_sources/:data_source/edit', ->
             @app.api.data_source @params.data_source,

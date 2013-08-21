@@ -1,12 +1,24 @@
-<dl class="dl-horizontal">
-  <dt>Name</dt>
-  <dd>{{data_source.name}}</dd>
-  <dt>User</dt>
-  <dd><a href="/users/{{escape data_source.user.uri}}">{{data_source.user.name}}</a></dd>
-  <dt>Filetype</dt>
-  <dd>{{data_source.filetype}}</dd>
-  <dt>Added</dt>
-  <dd>{{dateFormat data_source.added}}</dd>
-  <dt>URI</dt>
-  <dd>{{data_source.uri}}</dd>
+<table class="table table-striped table-properties">
+  <tbody>
+    <tr>
+      <th scope="row">Name</th>
+      <td>{{data_source.name}}</td>
+    </tr>
+    <tr>
+      <th scope="row">User</th>
+      <td><a href="/users/{{escape data_source.user.uri}}">{{data_source.user.name}}</a></td>
+    </tr>
+    <tr>
+      <th scope="row">Filetype</th>
+      <td>{{data_source.filetype}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Added</th>
+      <td>{{dateFormat data_source.added}}</td>
+    </tr>
+    <tr>
+      <th scope="row">URI</th>
+      <td>{{data_source.uri}}</td>
+    </tr>
+  </tbody>
 </dl>

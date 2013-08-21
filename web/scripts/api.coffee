@@ -71,6 +71,24 @@ define ['jquery', 'jquery.base64'], ($) ->
                         variations: r.variation_collection.uri
                     success?()
 
+        annotation: (uri, options={}) =>
+            uri += '?embed=original_data_source,annotated_data_source'  # Todo: Proper URI construction.
+            success = options.success
+            options.success = (data) -> success? data.annotation
+            @request uri, options
+
+        annotations: (options={}) =>
+            uri = @uris.annotations + '?embed=original_data_source,annotated_data_source'
+            if options.original_data_source?
+                uri += "&original_data_source=#{ encodeURIComponent options.original_data_source }"
+            @collection uri, options
+
+        create_annotation: (options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.annotation
+            options.method = 'POST'
+            @request @uris.annotations, options
+
         authenticate: (@login, @password, {success, error}) =>
             @current_user = null
             @request @uris.authentication,

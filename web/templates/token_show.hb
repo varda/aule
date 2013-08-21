@@ -1,11 +1,19 @@
-<dl class="dl-horizontal">
-  <dt>Name</dt>
-  <dd>{{token.name}}</dd>
-  <dt>Added</dd>
-  <dd>{{dateFormat token.added}}</dd>
-  <dt>URI</dt>
-  <dd>{{token.uri}}</dd>
-</dl>
+<table class="table table-striped table-properties">
+  <tbody>
+    <tr>
+      <th scope="row">Name</th>
+      <td>{{token.name}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Added</td>
+      <td>{{dateFormat token.added}}</td>
+    </tr>
+    <tr>
+      <th scope="row">URI</th>
+      <td>{{token.uri}}</td>
+    </tr>
+  </tbody>
+</table>
 
 <p>
   <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#token-view"><i class="icon-lock"></i> Show token</button>

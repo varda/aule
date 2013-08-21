@@ -17,8 +17,8 @@
     <i class="icon-spinner icon-spin"></i>
   {{/if_eq}}
   {{#if_eq task.state compare="progress"}}
-    <div class="progress">
-      <div class="bar" style="width: {{task.progress}}%;" title="{{task.progress}}%"></div>
+    <div class="progress" title="{{task.progress}}%">
+      <div class="bar" style="width: {{task.progress}}%;"></div>
     </div>
   {{/if_eq}}
 {{/if}}

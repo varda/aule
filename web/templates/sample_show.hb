@@ -1,19 +1,35 @@
-<dl class="dl-horizontal">
-  <dt>Name</dt>
-  <dd>{{sample.name}}</dd>
-  <dt>User</dt>
-  <dd><a href="/users/{{escape sample.user.uri}}">{{sample.user.name}}</a></dd>
-  <dt>Active</dt>
-  <dd>{{#if sample.active}}Yes{{else}}No{{/if}}</dd>
-  <dt>Public</dt>
-  <dd>{{#if sample.public}}Yes{{else}}No{{/if}}</dd>
-  <dt>Pool size</dt>
-  <dd>{{sample.pool_size}}</dd>
-  <dt>Added</dd>
-  <dd>{{dateFormat sample.added}}</dd>
-  <dt>URI</dt>
-  <dd>{{sample.uri}}</dd>
-</dl>
+<table class="table table-striped table-properties">
+  <tbody>
+    <tr>
+      <th scope="row">Name</th>
+      <td>{{sample.name}}</td>
+    </tr>
+    <tr>
+      <th scope="row">User</th>
+      <td><a href="/users/{{escape sample.user.uri}}">{{sample.user.name}}</a></td>
+    </tr>
+    <tr>
+      <th scope="row">Active</th>
+      <td>{{#if sample.active}}Yes{{else}}No{{/if}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Public</th>
+      <td>{{#if sample.public}}Yes{{else}}No{{/if}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Pool size</th>
+      <td>{{sample.pool_size}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Added</th>
+      <td>{{dateFormat sample.added}}</td>
+    </tr>
+    <tr>
+      <th scope="row">URI</th>
+      <td>{{sample.uri}}</td>
+    </tr>
+  </tbody>
+</table>
 
 {{#if sample.notes}}
 <h2>Notes</h2>
