@@ -1,12 +1,11 @@
 <form action="{{base}}/lookup_variant" method="post">
   <fieldset>
-    <label for="sample">Sample</label>
-    <select class="input-xlarge" name="sample" id="sample">
-      <option value="">None (global)</option>
-      {{#each samples}}
-        <option value="{{uri}}">{{name}}</option>
-      {{/each}}
-    </select>
+    <label>Sample frequency (leave empty for global frequency)</label>
+    <div class="form-picker input-xlarge" data-name="sample">
+      <div>
+        <a href="{{base}}/picker/samples?filter=public" class="picker-open">Choose a sample...</a>
+      </div>
+    </div>
     <label for="chromosome">Chromosome</label>
     <select class="input-xlarge" name="chromosome" id="chromosome">
       {{#each chromosomes}}

@@ -43,20 +43,55 @@ define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
             $('#dirty', form).val ($(x).attr 'name' for x in $(':input.dirty', form))
 
         # Keep track of dirty fields in edit forms.
-        $(document).delegate '.form-edit :input', 'input', ->
+        $(document).on 'input', '.form-edit :input', ->
             setDirty $(@), $("label[for='#{ @id }']")
-        $(document).delegate '.form-edit input:checkbox, .form-edit input:radio',
-            'change', ->
-                setDirty $(@), $(@).parent('label')
-        $(document).delegate '.form-edit', 'reset', ->
+        $(document).on 'change','.form-edit input:checkbox, .form-edit input:radio', ->
+            setDirty $(@), $(@).parent('label')
+        $(document).on 'reset', '.form-edit', ->
             $(':input, label', @).removeClass 'dirty'
             $('#dirty', @).val []
 
         # Facilitate clicking anywhere in a table row.
-        $(document).delegate 'tbody tr[data-href]', 'click', (e) ->
+        $(document).on 'click', 'tbody tr[data-href]', (e) ->
             e.preventDefault()
-            # Todo: Better to just trigger the a.click event?
             app.setLocation $(this).data('href')
+
+        # Open the picker modal.
+        # Todo: The picker doesn't work for edit forms.
+        $(document).on 'click', 'a.picker-open', (e) ->
+            e.preventDefault()
+            $('#picker').data('source', $(this).closest('.form-picker'))
+            app.runRoute 'get', $(this).attr('href')
+
+        # Clicking a row in the picker.
+        $('#picker').on 'click', 'tbody tr[data-uri]', (e) ->
+            e.preventDefault()
+            source = $('#picker').data('source')
+            add = $('div', source).last()
+            element = $("<div>
+                <input name=\"#{ source.data 'name' }\" type=\"hidden\" value=\"#{ $(this).data 'uri' }\">
+                <i class=\"icon-remove\"></i> #{ $(this).data 'name' }
+              </div>")
+            $('i', element).click ->
+                element.remove()
+                add.show()
+            add.before(element)
+            if not source.data 'multi'
+                add.hide()
+            $('#picker').modal('hide')
+
+        # Navigation in the picker modal.
+        $('#picker').on 'click', 'a', (e) ->
+            e.preventDefault()
+            app.runRoute 'get', $(this).attr('href')
+
+        # Reset all pickers.
+        $(document).on 'reset', 'form', ->
+            $('.form-picker', @).each ->
+                add = $('div', this).last().detach()
+                $('div', this).remove()
+                add.appendTo this
+                add.show()
 
         # Show the user that we are waiting for the server.
         $(document)

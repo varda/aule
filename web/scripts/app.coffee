@@ -25,7 +25,7 @@ define ['jquery',
         @init = (api) => @api = api
 
         # Taken from Sammy.js EventContext private method.
-        parseQueryString = (path) ->
+        parsePath = (path) ->
             parseParamPair = (params, key, value) ->
                 isArray = (obj) -> (Object.prototype.toString.call obj) == "[object Array]"
                 if params[key]?
@@ -37,14 +37,14 @@ define ['jquery',
                     params[key] = value
                 params
             decode = (str) -> decodeURIComponent (str?.replace /\+/g, ' ') ? ''
+            [match, base, query] = (path.match /^([^?]*)\?([^#]*)?$/) ? [false, path, '']
             params = {}
-            parts = path.match /\?([^#]*)?$/
-            if parts and parts[1]
-                pairs = parts[1].split '&'
+            if match and query
+                pairs = query.split '&'
                 for p in pairs
                     pair = p.split '='
                     params = parseParamPair params, (decode pair[0]), (decode pair[1] ? '')
-            params
+            [base, params]
 
         # Create pagination data for use in template.
         createPagination = (total, current=0) ->
@@ -76,6 +76,8 @@ define ['jquery',
                 add_sample: 'importer' in roles or 'admin' in roles
                 list_data_sources: 'admin' in roles
                 add_data_source: true
+                list_annotations: 'admin' in roles
+                add_annotation: 'trader' in roles or 'annotator' in roles or 'admin' in roles
                 list_users: 'admin' in roles
                 add_user: 'admin' in roles
 
@@ -95,8 +97,12 @@ define ['jquery',
             $('h1').html options.fn @
             $('title').html 'Aule - ' + options.fn @
             return
-        Handlebars.registerHelper 'query', (path, options) ->
-            $.param $.extend (parseQueryString path), options.hash
+        Handlebars.registerHelper 'pickerTitle', (options) ->
+            $('#picker .modal-header h3').html options.fn @
+            return
+        Handlebars.registerHelper 'updatePath', (path, options) ->
+            [base, params] = parsePath path
+            base + '?' + $.param $.extend params, options.hash
         Handlebars.registerHelper 'dateFormat', (date, options) ->
             moment(date).format options.hash.format ? 'MMM Do, YYYY'
         Handlebars.registerHelper 'numberFormat', (number, options) ->
@@ -131,6 +137,41 @@ define ['jquery',
             @partial (@template page), data, partials
             @render((@template 'navigation'), data).replace $('#navigation')
 
+        # Show picker.
+        @helper 'picker', (page, data={}, options={}) ->
+            partials = {}
+            data.base = config.RESOURCES_PREFIX
+            data.path = @path
+            data.auth = createAuth()
+            if options.pagination?
+                partials.pagination = @template 'pagination'
+                {total, current} = options.pagination
+                data.pagination = createPagination total, current
+            @render((@template "picker_#{page}"), data, partials).replace $('#picker .modal-body')
+            $('#picker').modal()
+
+        # Sample picker.
+        @get '/picker/samples', ->
+            @app.api.samples
+                filter: @params.filter
+                page_number: parseInt @params.page ? 0
+                success: (items, pagination) =>
+                    @picker 'samples',
+                        {samples: items, filter: @params.filter ? ''},
+                        {pagination: pagination}
+                error: (code, message) => @error message
+
+        # Data source picker.
+        @get '/picker/data_sources', ->
+            @app.api.data_sources
+                filter: @params.filter
+                page_number: parseInt @params.page ? 0
+                success: (items, pagination) =>
+                    @picker 'data_sources',
+                        {data_sources: items, filter: @params.filter ? ''},
+                        {pagination: pagination}
+                error: (code, message) => @error message
+
         # Index.
         @get '/', ->
             @show 'index'
@@ -153,6 +194,48 @@ define ['jquery',
                     @error message
             return
 
+        # List annotations.
+        @get '/annotations', ->
+            @app.api.annotations
+                filter: @params.filter
+                page_number: parseInt @params.page ? 0
+                success: (items, pagination) =>
+                    @show 'annotations',
+                        {annotations: items, filter: @params.filter ? ''},
+                        {subpage: 'list', pagination: pagination}
+                error: (code, message) => @error message
+
+        # Show annotation.
+        @get '/annotations/:annotation', ->
+            @app.api.annotation @params.annotation,
+                success: (annotation) =>
+                    @show 'annotation', {annotation: annotation}, {subpage: 'show'}
+                error: (code, message) => @error message
+
+        # Add annotation form.
+        @get '/annotations_add', ->
+            @show 'annotations', {}, {subpage: 'add'}
+
+        # Add annotation.
+        @post '/annotations', ->
+            if @params.sample_frequency?.join?
+                sample_frequency = @params.sample_frequency.join ','
+            else
+                sample_frequency = @params.sample_frequency ? ''
+            @app.api.create_annotation
+                data:
+                    name: @params.name
+                    data_source: @params.data_source
+                    global_frequency: @params.global_frequency?
+                    sample_frequency: sample_frequency
+                success: (annotation) =>
+                    location = config.RESOURCES_PREFIX + '/annotations/'
+                    location += (encodeURIComponent annotation.uri)
+                    @redirect location
+                    @success "Added annotation '#{@params.name}'"
+                error: (code, message) => @error message
+            return
+
         # List data sources.
         @get '/data_sources', ->
             @app.api.data_sources
@@ -170,64 +253,6 @@ define ['jquery',
                 success: (data_source) =>
                     @show 'data_source', {data_source: data_source}, {subpage: 'show'}
                 error: (code, message) => @error message
-
-        # List data source annotations.
-        @get '/data_sources/:data_source/annotations', ->
-            @app.api.data_source @params.data_source,
-                success: (data_source) =>
-                    @app.api.annotations
-                        original_data_source: @params.data_source
-                        page_number: parseInt @params.page ? 0
-                        success: (items, pagination) =>
-                            @show 'data_source',
-                                {data_source: data_source, annotations: items},
-                                {subpage: 'annotations', pagination: pagination}
-                        error: (code, message) => @error message
-                error: (code, message) => @error message
-
-        # Show annotation.
-        @get '/annotations/:annotation', ->
-            @app.api.annotation @params.annotation,
-                success: (annotation) =>
-                    @show 'annotation', {annotation: annotation}, {subpage: 'show'}
-                error: (code, message) => @error message
-
-        # Add annotation form.
-        @get '/data_sources/:data_source/annotations_add', ->
-            @app.api.data_source @params.data_source,
-                success: (data_source) =>
-                    # Todo: We currently only show public samples, but in it
-                    #     should also be possible to select any of your own
-                    #     samples.
-                    @app.api.samples
-                        filter: 'public'
-                        success: (items, pagination) =>
-                            @show 'data_source',
-                                {data_source: data_source, samples: items},
-                                {subpage: 'annotations_add'}
-                        error: (code, message) => @error message
-                error: (code, message) => @error message
-
-        # Add annotation.
-        @post '/data_sources/:data_source/annotations', ->
-            if @params.sample_frequency?.join?
-                sample_frequency = @params.sample_frequency.join ','
-            else
-                sample_frequency = @params.sample_frequency ? ''
-            @app.api.create_annotation
-                data:
-                    name: @params.name
-                    data_source: @params.data_source
-                    global_frequency: @params.global_frequency?
-                    sample_frequency: sample_frequency
-                success: (annotation) =>
-                    console.log annotation
-                    location = config.RESOURCES_PREFIX + '/annotations/'
-                    location += (encodeURIComponent annotation.uri)
-                    @redirect location
-                    @success "Added annotation '#{@params.name}'"
-                error: (code, message) => @error message
-            return
 
         # Edit data source form.
         @get '/data_sources/:data_source/edit', ->
@@ -291,17 +316,9 @@ define ['jquery',
 
         # Lookup variant form.
         @get '/lookup_variant', ->
-            # Todo: Instead of the ugly nesting of these request callbacks, we
-            #     should jQuery deferred objects or a similar pattern.
-            #     For example, see: http://api.jquery.com/jQuery.when/
-            # Todo: Due to pagination, this might not give all public samples.
-            @app.api.samples
-                filter: 'public'
-                success: (items, pagination) =>
-                    @app.api.genome
-                        success: (genome) =>
-                            @show 'lookup', {samples: items, chromosomes: genome.chromosomes}, {subpage: 'variant'}
-                        error: (code, message) => @error message
+            @app.api.genome
+                success: (genome) =>
+                    @show 'lookup', {chromosomes: genome.chromosomes}, {subpage: 'variant'}
                 error: (code, message) => @error message
 
         # Lookup variant.
@@ -323,14 +340,9 @@ define ['jquery',
 
         # Lookup variants form.
         @get '/lookup_region', ->
-            # Todo: Due to pagination, this might not give all public samples.
-            @app.api.samples
-                filter: 'public'
-                success: (items, pagination) =>
-                    @app.api.genome
-                        success: (genome) =>
-                            @show 'lookup', {samples: items, chromosomes: genome.chromosomes}, {subpage: 'region'}
-                        error: (code, message) => @error message
+            @app.api.genome
+                success: (genome) =>
+                    @show 'lookup', {chromosomes: genome.chromosomes}, {subpage: 'region'}
                 error: (code, message) => @error message
 
         # List samples.
@@ -419,6 +431,9 @@ define ['jquery',
 
         # Sample variations.
         @get '/samples/:sample/variations', ->
+            # Todo: Instead of the ugly nesting of these request callbacks, we
+            #     should use jQuery deferred objects [1] or a similar pattern.
+            # [1] http://api.jquery.com/jQuery.when/
             @app.api.sample @params.sample,
                 success: (sample) =>
                     @app.api.variations
@@ -433,6 +448,9 @@ define ['jquery',
 
         # Sample coverages.
         @get '/samples/:sample/coverages', ->
+            # Todo: Instead of the ugly nesting of these request callbacks, we
+            #     should use jQuery deferred objects [1] or a similar pattern.
+            # [1] http://api.jquery.com/jQuery.when/
             @app.api.sample @params.sample,
                 success: (sample) =>
                     @app.api.coverages

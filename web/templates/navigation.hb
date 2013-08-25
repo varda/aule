@@ -17,6 +17,13 @@
         <li><a href="{{base}}/data_sources?filter=own">Data sources</a></li>
       {{/if}}
     {{/if}}
+    {{#if auth.rights.list_annotations}}
+      <li><a href="{{base}}/annotations">Annotations</a></li>
+    {{else}}
+      {{#if auth}}
+        <li><a href="{{base}}/annotations?filter=own">Annotations</a></li>
+      {{/if}}
+    {{/if}}
     {{#if auth.rights.list_users}}
       <li><a href="{{base}}/users">Users</a></li>
     {{/if}}

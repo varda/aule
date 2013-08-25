@@ -10,10 +10,10 @@
 # Todo: Cache resources.
 
 
-define ['jquery', 'jquery.base64'], ($) ->
+define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
 
     # Accepted server API versions.
-    ACCEPT_VERSION = '>=0.2.1,<0.3.0'
+    ACCEPT_VERSION = '>=0.3.0,<0.4.0'
 
     # Create HTTP Basic Authentication header value.
     makeBasicAuth = (login, password) ->
@@ -29,7 +29,7 @@ define ['jquery', 'jquery.base64'], ($) ->
         r.setRequestHeader 'Accept-Version', ACCEPT_VERSION
 
     # Add Range header to request for collection resources.
-    addRangeForPage = (page, page_size=50) ->
+    addRangeForPage = (page, page_size=config.PAGE_SIZE) ->
         start = page * page_size
         end = start + page_size - 1
         (r) -> r.setRequestHeader 'Range', "items=#{ start }-#{ end }"
@@ -79,8 +79,8 @@ define ['jquery', 'jquery.base64'], ($) ->
 
         annotations: (options={}) =>
             uri = @uris.annotations + '?embed=original_data_source,annotated_data_source'
-            if options.original_data_source?
-                uri += "&original_data_source=#{ encodeURIComponent options.original_data_source }"
+            if options.filter == 'own'
+                uri += "&annotated_data_source.user=#{ encodeURIComponent @current_user?.uri }"
             @collection uri, options
 
         create_annotation: (options={}) =>
@@ -258,9 +258,9 @@ define ['jquery', 'jquery.base64'], ($) ->
 
         collection: (uri, options={}) =>
             options.page_number ?= 0
-            options.page_size ?= 50
+            options.page_size ?= config.PAGE_SIZE
             @request uri,
-                beforeSend: addRangeForPage options.page_number
+                beforeSend: addRangeForPage options.page_number, config.PAGE_SIZE
                 success: (data, status, xhr) ->
                     range = xhr.getResponseHeader 'Content-Range'
                     total = parseInt (range.split '/')[1]
