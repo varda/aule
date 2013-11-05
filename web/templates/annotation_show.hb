@@ -2,11 +2,11 @@
   <tbody>
     <tr>
       <th scope="row">Original data source</th>
-      <td><a href="/data_sources/{{escape annotation.original_data_source.uri}}">{{annotation.original_data_source.name}}</a></td>
+      <td><a href="{{base}}/data_sources/{{escape annotation.original_data_source.uri}}">{{annotation.original_data_source.name}}</a></td>
     </tr>
     <tr>
       <th scope="row">Annotated data source</th>
-      <td><a href="/data_sources/{{escape annotation.annotated_data_source.uri}}">{{annotation.annotated_data_source.name}}</a></td>
+      <td><a href="{{base}}/data_sources/{{escape annotation.annotated_data_source.uri}}">{{annotation.annotated_data_source.name}}</a></td>
     </tr>
     <tr>
       <th scope="row">Written</th>

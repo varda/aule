@@ -6,7 +6,7 @@
     </tr>
     <tr>
       <th scope="row">User</th>
-      <td><a href="/users/{{escape sample.user.uri}}">{{sample.user.name}}</a></td>
+      <td><a href="{{base}}/users/{{escape sample.user.uri}}">{{sample.user.name}}</a></td>
     </tr>
     <tr>
       <th scope="row">Active</th>

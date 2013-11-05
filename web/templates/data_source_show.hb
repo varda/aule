@@ -6,11 +6,11 @@
     </tr>
     <tr>
       <th scope="row">User</th>
-      <td><a href="/users/{{escape data_source.user.uri}}">{{data_source.user.name}}</a></td>
+      <td><a href="{{base}}/users/{{escape data_source.user.uri}}">{{data_source.user.name}}</a></td>
     </tr>
     <tr>
       <th scope="row">Filetype</th>
-      <td>{{data_source.filetype}}</td>
+      <td>{{data_source.filetype}}{{#if data_source.gzipped}} (compressed){{/if}}</td>
     </tr>
     <tr>
       <th scope="row">Added</th>
