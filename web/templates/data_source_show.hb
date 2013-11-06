@@ -21,4 +21,10 @@
       <td>{{data_source.uri}}</td>
     </tr>
   </tbody>
-</dl>
+</table>
+
+<p>Use <a href="http://curl.haxx.se/"><code>curl</code></a> and an <a href="{{base}}/tokens">API token</a> to download this data source to your computer:</p>
+
+<pre>
+curl -H 'Authorization: Token &lt;API token&gt;' 'https://&lt;domain&gt;{{data_source.data.uri}}' &gt; data.{{data_source.filetype}}{{#if data_source.gzipped}}.gz{{/if}}
+</pre>
