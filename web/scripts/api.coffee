@@ -13,7 +13,7 @@
 define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
 
     # Accepted server API versions.
-    ACCEPT_VERSION = '>=0.3.0,<0.4.0'
+    ACCEPT_VERSION = '>=1.0.0,<2.0.0'
 
     # Create HTTP Basic Authentication header value.
     makeBasicAuth = (login, password) ->
@@ -54,21 +54,21 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             @request @root,
                 error: error
                 success: (r) =>
-                    if r.status != 'ok'
+                    if r.root.status != 'ok'
                         error? 'response_error', 'Unexpected response from server'
                         return
                     @uris =
                         root: @root
-                        authentication: r.authentication.uri
-                        genome: r.genome.uri
-                        annotations: r.annotation_collection.uri
-                        coverages: r.coverage_collection.uri
-                        data_sources: r.data_source_collection.uri
-                        samples: r.sample_collection.uri
-                        tokens: r.token_collection.uri
-                        users: r.user_collection.uri
-                        variants: r.variant_collection.uri
-                        variations: r.variation_collection.uri
+                        authentication: r.root.authentication.uri
+                        genome: r.root.genome.uri
+                        annotations: r.root.annotation_collection.uri
+                        coverages: r.root.coverage_collection.uri
+                        data_sources: r.root.data_source_collection.uri
+                        samples: r.root.sample_collection.uri
+                        tokens: r.root.token_collection.uri
+                        users: r.root.user_collection.uri
+                        variants: r.root.variant_collection.uri
+                        variations: r.root.variation_collection.uri
                     success?()
 
         annotation: (uri, options={}) =>
@@ -81,7 +81,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             uri = @uris.annotations + '?embed=original_data_source,annotated_data_source'
             if options.filter == 'own'
                 uri += "&annotated_data_source.user=#{ encodeURIComponent @current_user?.uri }"
-            @collection uri, options
+            @collection uri, 'annotation', options
 
         create_annotation: (options={}) =>
             success = options.success
@@ -93,8 +93,8 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             @current_user = null
             @request @uris.authentication,
                 success: (r) =>
-                    if r.authenticated
-                        @current_user = r.user
+                    if r.authentication.authenticated
+                        @current_user = r.authentication.user
                         success?()
                     else
                         error? 'authentication_error',
@@ -105,7 +105,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             uri = @uris.coverages + '?embed=data_source'
             if options.sample?
                 uri += "&sample=#{ encodeURIComponent options.sample }"
-            @collection uri, options
+            @collection uri, 'coverage', options
 
         data_source: (uri, options={}) =>
             uri += '?embed=user'  # Todo: Proper URI construction.
@@ -117,7 +117,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             uri = @uris.data_sources
             if options.filter == 'own'
                 uri += "?user=#{ encodeURIComponent @current_user?.uri }"
-            @collection uri, options
+            @collection uri, 'data_source', options
 
         create_data_source: (options={}) =>
             success = options.success
@@ -154,7 +154,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
                 uri += "?user=#{ encodeURIComponent @current_user?.uri }"
             if options.filter == 'public'
                 uri += '?public=true'
-            @collection uri, options
+            @collection uri, 'sample', options
 
         create_sample: (options={}) =>
             success = options.success
@@ -183,7 +183,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             uri = @uris.tokens
             if options.filter == 'own'
                 uri += "?user=#{ encodeURIComponent @current_user?.uri }"
-            @collection uri, options
+            @collection uri, 'token', options
 
         create_token: (options={}) =>
             success = options.success
@@ -209,7 +209,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             @request uri, options
 
         users: (options={}) =>
-            @collection @uris.users, options
+            @collection @uris.users, 'user', options
 
         create_user: (options={}) =>
             success = options.success
@@ -233,7 +233,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             uri = @uris.variations + '?embed=data_source'
             if options.sample?
                 uri += "&sample=#{ encodeURIComponent options.sample }"
-            @collection uri, options
+            @collection uri, 'variation', options
 
         variant: (uri, options={}) =>
             success = options.success
@@ -248,7 +248,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             uri += "?region=#{ encodeURIComponent region }"
             if options.sample
                 uri += "&sample=#{ encodeURIComponent options.sample }"
-            @collection uri, options
+            @collection uri, 'variant', options
 
         create_variant: (options={}) =>
             success = options.success
@@ -256,7 +256,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             options.method = 'POST'
             @request @uris.variants, options
 
-        collection: (uri, options={}) =>
+        collection: (uri, type, options={}) =>
             options.page_number ?= 0
             options.page_size ?= config.PAGE_SIZE
             @request uri,
@@ -267,7 +267,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
                     pagination =
                         total: Math.ceil total / options.page_size
                         current: options.page_number
-                    options.success? data.collection.items, pagination
+                    options.success? data["#{ type }_collection"].items, pagination
                 error: (code, message) ->
                     if code == 'unsatisfiable_range'
                         options.success? [], total: 0, current: 0
