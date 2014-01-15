@@ -640,6 +640,7 @@ define ['jquery',
                     login: @params.login
                     password: @params.password
                     roles: roles
+                    email: @params.email
                 success: (user) =>
                     location = config.RESOURCES_PREFIX + '/users/'
                     location += (encodeURIComponent user.uri)

@@ -24,8 +24,6 @@
         <input type="checkbox" name="roles" value="trader"> Trader
       </label>
     </div>
-    <label for="email">Email</label>
-    <input type="text" class="input-xlarge" name="email" id="email">
     <div class="form-actions">
       <button type="submit" class="btn btn-success"><i class="icon-plus"></i> Add user</button>
       <button type="reset" class="btn">Reset</button>
