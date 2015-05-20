@@ -1,7 +1,7 @@
 {{#title}}Welcome to Aulë{{/title}}
 
 <p>Aulë is a web interface to
-the <a href="https://github.com/martijnvermaat/varda">Varda</a>
+the <a href="https://github.com/varda/varda">Varda</a>
 database for genomic variation frequencies.</p>
 
 <!--

@@ -1,6 +1,6 @@
 [submodule "bootstrap"]
 	path = bootstrap
-	url = https://github.com/martijnvermaat/bootstrap.git
+	url = https://github.com/varda/bootstrap.git
 [submodule "sammy"]
 	path = sammy
-	url = https://github.com/martijnvermaat/sammy.git
+	url = https://github.com/varda/sammy.git

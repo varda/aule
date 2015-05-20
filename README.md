@@ -1,8 +1,8 @@
 Aulë
 ====
 
-A web interface to the [Varda](https://github.com/martijnvermaat/varda)
-database for genomic variation frequencies.
+A web interface to the [Varda](https://github.com/vara/varda) database for
+genomic variation frequencies.
 
 **Warning:** This is a work in progress, probably not yet ready for use!
 
@@ -34,7 +34,7 @@ Installation and configuration
 
 Start by getting the source code:
 
-    git clone https://github.com/martijnvermaat/aule.git
+    git clone https://github.com/varda/aule.git
     git submodule init
     git submodule update
 
