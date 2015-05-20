@@ -38,8 +38,8 @@ Start by getting the source code:
     git submodule init
     git submodule update
 
-Now have a look at `web/scripts/config.coffee` and modify according to your
-needs.
+Now copy `web/scripts/config.coffee.example` to `web/scripts/config.coffee`
+and modify according to your needs.
 
 Since communication between Aulë and Varda is subject to the
 [Same origin policy](http://en.wikipedia.org/wiki/Same_origin_policy), both

@@ -7,6 +7,10 @@
 # Licensed under the MIT license, see the LICENSE file.
 
 
+# This is an example configuration file. To run Aulë, copy this file to
+# `config.coffee` and modify to your liking.
+
+
 define ->
 
     # Prefix for resources such as templates.
