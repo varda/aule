@@ -40,11 +40,16 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             try
                 error = ($.parseJSON xhr.responseText).error
             catch e
-                error =
-                    code: 'response_error',
-                    message: "Unable to parse server response (status: #{xhr.status} #{xhr.statusText})"
-                console.log 'Unable to parse server response'
-                console.log xhr.responseText
+                if xhr.status == 503
+                    error =
+                        code: 'maintenance',
+                        message: 'The server is currently undergoing maintenance'
+                else
+                    error =
+                        code: 'response_error',
+                        message: "Unable to parse server response (status: #{xhr.status} #{xhr.statusText})"
+                    console.log 'Unable to parse server response'
+                    console.log xhr.responseText
             handler? error.code, error.message
 
     class Api
