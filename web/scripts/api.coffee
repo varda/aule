@@ -13,7 +13,7 @@
 define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
 
     # Accepted server API versions.
-    ACCEPT_VERSION = '>=1.0.0,<2.0.0'
+    ACCEPT_VERSION = '>=1.1.0,<2.0.0'
 
     # Create HTTP Basic Authentication header value.
     makeBasicAuth = (login, password) ->
@@ -69,6 +69,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
                         annotations: r.root.annotation_collection.uri
                         coverages: r.root.coverage_collection.uri
                         data_sources: r.root.data_source_collection.uri
+                        groups: r.root.group_collection.uri
                         samples: r.root.sample_collection.uri
                         tokens: r.root.token_collection.uri
                         users: r.root.user_collection.uri
@@ -146,6 +147,32 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             success = options.success
             options.success = (data) -> success? data.genome
             @request @uris.genome, options
+
+        group: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.group
+            @request uri, options
+
+        groups: (options={}) =>
+            @collection @uris.groups, 'group', options
+
+        create_group: (options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.group
+            options.method = 'POST'
+            @request @uris.groups, options
+
+        edit_group: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success? data.group
+            options.method = 'PATCH'
+            @request uri, options
+
+        delete_group: (uri, options={}) =>
+            success = options.success
+            options.success = (data) -> success?()
+            options.method = 'DELETE'
+            @request uri, options
 
         sample: (uri, options={}) =>
             uri += '?embed=user'  # Todo: Proper URI construction.

@@ -78,6 +78,7 @@ define ['jquery',
                 add_data_source: true
                 list_annotations: 'admin' in roles
                 add_annotation: 'trader' in roles or 'annotator' in roles or 'admin' in roles
+                add_group: 'admin' in roles
                 list_users: 'admin' in roles
                 add_user: 'admin' in roles
 
@@ -311,6 +312,82 @@ define ['jquery',
                     location += (encodeURIComponent data_source.uri)
                     @redirect location
                     @success "Added data source '#{@params.name}'"
+                error: (code, message) => @error message
+            return
+
+        # List groups.
+        @get '/groups', ->
+            @app.api.groups
+                filter: @params.filter
+                page_number: parseInt @params.page ? 0
+                success: (items, pagination) =>
+                    @show 'groups',
+                        {groups: items, filter: @params.filter ? ''},
+                        {subpage: 'list', pagination: pagination}
+                error: (code, message) => @error message
+
+        # Show group.
+        @get '/groups/:group', ->
+            @app.api.group @params.group,
+                success: (group) =>
+                    @show 'group', {group: group}, {subpage: 'show'}
+                error: (code, message) => @error message
+
+        # Edit group form.
+        @get '/groups/:group/edit', ->
+            @app.api.group @params.group,
+                success: (group) =>
+                    @show 'group', {group: group}, {subpage: 'edit'}
+                error: (code, message) => @error message
+
+        # Edit group.
+        @post '/groups/:group/edit', ->
+            if not @params.dirty
+                @error 'Group is unchanged'
+                return
+            params = {}
+            for field in @params.dirty.split ','
+                params[field] = @params[field]
+            @app.api.edit_group @params.group,
+                data: params
+                success: (group) =>
+                    location = config.RESOURCES_PREFIX + '/groups/'
+                    location += (encodeURIComponent group.uri)
+                    @redirect location
+                    @success "Saved group '#{@params.name}'"
+                error: (code, message) => @error message
+            return
+
+        # Delete group form.
+        @get '/groups/:group/delete', ->
+            @app.api.group @params.group,
+                success: (group) =>
+                    @show 'group', {group: group}, {subpage: 'delete'}
+                error: (code, message) => @error message
+
+        # Delete group.
+        @post '/groups/:group/delete', ->
+            @app.api.delete_group @params.group,
+                success: =>
+                    @redirect config.RESOURCES_PREFIX + '/groups'
+                    @success "Deleted group '#{@params.name}'"
+                error: (code, message) => @error message
+            return
+
+        # Add group form.
+        @get '/groups_add', ->
+            @show 'groups', {}, {subpage: 'add'}
+
+        # Add group.
+        @post '/groups', ->
+            @app.api.create_group
+                data:
+                    name: @params.name
+                success: (group) =>
+                    location = config.RESOURCES_PREFIX + '/groups/'
+                    location += (encodeURIComponent group.uri)
+                    @redirect location
+                    @success "Added group '#{@params.name}'"
                 error: (code, message) => @error message
             return
 
