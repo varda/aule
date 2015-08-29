@@ -402,6 +402,23 @@ define ['jquery',
                 error: (code, message) => @error message
             return
 
+        # Group samples.
+        @get '/groups/:group/samples', ->
+            # Todo: Instead of the ugly nesting of these request callbacks, we
+            #     should use jQuery deferred objects [1] or a similar pattern.
+            # [1] http://api.jquery.com/jQuery.when/
+            @app.api.group @params.group,
+                success: (group) =>
+                    @app.api.samples
+                        group: @params.group
+                        page_number: parseInt @params.page ? 0
+                        success: (items, pagination) =>
+                            @show 'group',
+                                {group: group, samples: items},
+                                {subpage: 'samples', pagination: pagination}
+                        error: (code, message) => @error message
+                error: (code, message) => @error message
+
         # Lookup variant form.
         @get '/lookup_variant', ->
             @app.api.genome

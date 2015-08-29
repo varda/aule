@@ -6,6 +6,12 @@
   <a href="{{base}}/groups/{{escape group.uri}}"><i class="icon-file"></i> Group</a>
 </li>
 
+{{#if auth.rights.list_samples}}
+  <li class="{{#if_eq subpage compare="samples"}}active{{/if_eq}}">
+    <a href="{{base}}/groups/{{escape group.uri}}/samples"><i class="icon-th-large"></i> Samples</a>
+  </li>
+{{/if}}
+
 {{#if auth.roles.admin}}
   <li class="pull-right{{#if_eq subpage compare="edit"}} active{{/if_eq}}">
     <a href="{{base}}/groups/{{escape group.uri}}/edit"><i class="icon-pencil"></i> Edit group</a>

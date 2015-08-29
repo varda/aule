@@ -186,6 +186,8 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
                 uri += "?user=#{ encodeURIComponent @current_user?.uri }"
             if options.filter == 'public'
                 uri += '?public=true'
+            if options.group?
+                uri += "?groups=#{ encodeURIComponent options.group }"
             @collection uri, 'sample', options
 
         create_sample: (options={}) =>
