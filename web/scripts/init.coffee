@@ -40,7 +40,9 @@ define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
             # the Sammy route was called. So we do this aggregation on every
             # field change (this includes pressing a key in a text field).
             form = field.closest 'form'
-            $('#dirty', form).val ($(x).attr 'name' for x in $(':input.dirty', form))
+            #$('#dirty', form).val ($(x).attr 'name' for x in $(':input.dirty', form))
+            $('#dirty', form).val (for x in $(':input.dirty, .form-picker.dirty', form)
+                                       ($(x).attr 'name') or ($(x).data 'name'))
 
         # Keep track of dirty fields in edit forms.
         $(document).on 'input', '.form-edit :input', ->
@@ -48,7 +50,7 @@ define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
         $(document).on 'change','.form-edit input:checkbox, .form-edit input:radio', ->
             setDirty $(@), $(@).parent('label')
         $(document).on 'reset', '.form-edit', ->
-            $(':input, label', @).removeClass 'dirty'
+            $(':input, .form-picker, label', @).removeClass 'dirty'
             $('#dirty', @).val []
 
         # Facilitate clicking anywhere in a table row.
@@ -57,7 +59,6 @@ define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
             app.setLocation $(this).data('href')
 
         # Open the picker modal.
-        # Todo: The picker doesn't work for edit forms.
         $(document).on 'click', 'a.picker-open', (e) ->
             e.preventDefault()
             $('#picker').data('source', $(this).closest('.form-picker'))
@@ -72,13 +73,20 @@ define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
                 <input name=\"#{ source.data 'name' }\" type=\"hidden\" value=\"#{ $(this).data 'uri' }\">
                 <i class=\"icon-remove\"></i> #{ $(this).data 'name' }
               </div>")
-            $('i', element).click ->
-                element.remove()
-                add.show()
             add.before(element)
             if not source.data 'multi'
                 add.hide()
+            setDirty source, $("label[for='#{ source.data 'name' }']")
             $('#picker').modal('hide')
+
+        # Removing an element from a picker field.
+        $(document).on 'click', '.form-picker div i', (e) ->
+            element = $(this).closest('div')
+            source = element.parent()
+            add = $('div', source).last()
+            element.remove()
+            add.show()
+            setDirty source, $("label[for='#{ source.data 'name' }']")
 
         # Navigation in the picker modal.
         $('#picker').on 'click', 'a', (e) ->

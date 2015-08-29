@@ -108,6 +108,8 @@ define ['jquery',
             moment(date).format options.hash.format ? 'MMM Do, YYYY'
         Handlebars.registerHelper 'numberFormat', (number, options) ->
             number.toFixed options.hash.decimals ? 2
+        Handlebars.registerHelper 'commaSeparated', (items, options) ->
+            items.join(',')
 
         # Get location for template.
         @helper 'template', (name) ->
@@ -170,6 +172,17 @@ define ['jquery',
                 success: (items, pagination) =>
                     @picker 'data_sources',
                         {data_sources: items, filter: @params.filter ? ''},
+                        {pagination: pagination}
+                error: (code, message) => @error message
+
+        # Group picker.
+        @get '/picker/groups', ->
+            @app.api.groups
+                filter: @params.filter
+                page_number: parseInt @params.page ? 0
+                success: (items, pagination) =>
+                    @picker 'groups',
+                        {groups: items, filter: @params.filter ? ''},
                         {pagination: pagination}
                 error: (code, message) => @error message
 
@@ -346,8 +359,6 @@ define ['jquery',
                 @error 'Group is unchanged'
                 return
             params = {}
-            for field in @params.dirty.split ','
-                params[field] = @params[field]
             @app.api.edit_group @params.group,
                 data: params
                 success: (group) =>
@@ -474,7 +485,12 @@ define ['jquery',
                 return
             params = {}
             for field in @params.dirty.split ','
-                if field in ['coverage_profile', 'public']
+                if field is 'groups'
+                    if @params[field]?.join?
+                        value = @params[field].join ','
+                    else
+                        value = @params[field] ? ''
+                else if field in ['coverage_profile', 'public']
                     value = @params[field]?
                 else
                     value = @params[field]

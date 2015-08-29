@@ -175,7 +175,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             @request uri, options
 
         sample: (uri, options={}) =>
-            uri += '?embed=user'  # Todo: Proper URI construction.
+            uri += '?embed=user,groups'  # Todo: Proper URI construction.
             success = options.success
             options.success = (data) -> success? data.sample
             @request uri, options
@@ -198,6 +198,7 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             success = options.success
             options.success = (data) -> success? data.sample
             options.method = 'PATCH'
+            console.log options
             @request uri, options
 
         delete_sample: (uri, options={}) =>

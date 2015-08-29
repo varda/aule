@@ -3,6 +3,18 @@
   <fieldset>
     <label for="name">Sample name</label>
     <input type="text" class="input-xlarge" name="name" id="name" value="{{sample.name}}">
+    <label for="groups">Groups</label>
+    <div class="form-picker input-xlarge" data-name="groups" data-multi="true">
+      {{#each sample.groups}}
+        <div>
+          <input name="groups" type="hidden" value="{{ uri }}">
+          <i class="icon-remove"></i> {{name}}
+        </div>
+      {{/each}}
+      <div>
+        <a href="{{base}}/picker/groups" class="picker-open">Add a group...</a>
+      </div>
+    </div>
     <label for="pool_size">Pool size</label>
     <div class="input-append">
       <input type="text" class="input-mini" text-align="right" name="pool_size" id="pool_size" value="{{sample.pool_size}}">

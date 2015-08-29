@@ -1,6 +1,6 @@
 <form action="{{base}}/variants" method="get">
   <fieldset>
-    <label>Sample frequencies (leave empty for global frequencies)</label>
+    <label for="sample">Sample frequencies (leave empty for global frequencies)</label>
     <div class="form-picker input-xlarge" data-name="sample">
       <div>
         <a href="{{base}}/picker/samples?filter=public" class="picker-open">Choose a sample...</a>
