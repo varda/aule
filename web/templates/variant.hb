@@ -1,8 +1,21 @@
 {{#title}}{{variant.chromosome}}:{{variant.position}}{{/title}}
 
 <dl class="dl-horizontal">
-  <dt>Sample</dt>
-  <dd>{{#if variant.sample_uri}}{{variant.sample_uri}}{{else}}None (global){{/if}}</dd>
+  <dt>Query</dt>
+  <dd>
+    {{#if_eq query compare="global"}}
+    Global query
+    {{/if_eq}}
+    {{#if_eq query compare="sample"}}
+    Sample query: <a href="{{base}}/samples/{{escape sample.uri}}">{{sample.name}}</a>
+    {{/if_eq}}
+    {{#if_eq query compare="group"}}
+    Group query: <a href="{{base}}/group/{{escape group.uri}}">{{group.name}}</a>
+    {{/if_eq}}
+    {{#if_eq query compare="custom"}}
+    Custom query: <code>{{custom}}</code>
+    {{/if_eq}}
+  </dd>
   <dt>Chromosome</dt>
   <dd>{{variant.chromosome}}</dd>
   <dt>Position</dt>

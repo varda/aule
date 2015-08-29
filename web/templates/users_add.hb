@@ -23,6 +23,12 @@
       <label class="checkbox">
         <input type="checkbox" name="roles" value="trader"> Trader
       </label>
+      <label class="checkbox">
+        <input type="checkbox" name="roles" value="querier"> Querier
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" name="roles" value="group-querier"> Group querier
+      </label>
     </div>
     <div class="form-actions">
       <button type="submit" class="btn btn-success"><i class="icon-plus"></i> Add user</button>

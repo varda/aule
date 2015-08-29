@@ -71,16 +71,24 @@ define ['jquery',
                 importer: 'importer' in roles
                 annotator: 'annotator' in roles
                 trader: 'trader' in roles
+                querier: 'querier' in roles
+                group_querier: 'group-querier' in roles
             rights:
                 list_samples: 'admin' in roles
                 add_sample: 'importer' in roles or 'admin' in roles
                 list_data_sources: 'admin' in roles
                 add_data_source: true
                 list_annotations: 'admin' in roles
-                add_annotation: 'trader' in roles or 'annotator' in roles or 'admin' in roles
+                add_annotation: true #'trader' in roles or 'annotator' in roles or 'admin' in roles
                 add_group: 'admin' in roles
                 list_users: 'admin' in roles
                 add_user: 'admin' in roles
+                query: 'admin' in roles or ('annotator' in roles and 'querier' in roles)
+                group_query: 'admin' in roles or ('annotator' in roles and ('querier' in roles or 'group-querier' in roles))
+                global_query: 'admin' in roles or 'annotator' in roles
+                # TODO: We ignored traders. They should be able to add an
+                #   annotation (the original data source might be theirs),
+                #   but not do lookups.
 
         # We use Handlebars for templates.
         @use Sammy.Handlebars, 'hb'
@@ -232,16 +240,15 @@ define ['jquery',
 
         # Add annotation.
         @post '/annotations', ->
-            if @params.sample_frequency?.join?
-                sample_frequency = @params.sample_frequency.join ','
-            else
-                sample_frequency = @params.sample_frequency ? ''
+            query = switch @params.query
+                when 'sample' then "sample: #{ @params.sample }"
+                when 'group' then "group: #{ @params.group }"
+                when 'custom' then @params.custom
+                else '*'
             @app.api.create_annotation
-                data:
-                    name: @params.name
-                    data_source: @params.data_source
-                    global_frequency: @params.global_frequency?
-                    sample_frequency: sample_frequency
+                name: @params.name
+                data_source: @params.data_source
+                query: query
                 success: (annotation) =>
                     location = config.RESOURCES_PREFIX + '/annotations/'
                     location += (encodeURIComponent annotation.uri)
@@ -437,8 +444,10 @@ define ['jquery',
                 success: (variant) =>
                     location = config.RESOURCES_PREFIX + '/variants/'
                     location += (encodeURIComponent variant.uri)
-                    if @params.sample
-                        location += '?sample=' + (encodeURIComponent @params.sample)
+                    location += "?query=#{ encodeURIComponent @params.query }"
+                    location += "&sample=#{ encodeURIComponent @params.sample }"
+                    location += "&group=#{ encodeURIComponent @params.group }"
+                    location += "&custom=#{ encodeURIComponent @params.custom }"
                     @redirect location
                 error: (code, message) => @error message
             return
@@ -683,6 +692,8 @@ define ['jquery',
                         importer: 'importer' in user.roles
                         annotator: 'annotator' in user.roles
                         trader: 'trader' in user.roles
+                        querier: 'querier' in user.roles
+                        group_querier: 'group-querier' in user.roles
                     @show 'user', {user: user}, {subpage: 'edit'}
                 error: (code, message) => @error message
 
@@ -761,24 +772,67 @@ define ['jquery',
 
         # Show variant.
         @get '/variants/:variant', ->
-            data = {}
-            if @params.sample? then data.sample = @params.sample
+            query = switch @params.query
+                when 'sample' then "sample: #{ @params.sample }"
+                when 'group' then "group: #{ @params.group }"
+                when 'custom' then @params.custom
+                else '*'
             @app.api.variant @params.variant,
-                data: data
-                success: (variant) => @show 'variant', {variant: variant}
+                query: query
+                success: (variant) =>
+                    params =
+                        variant: variant
+                        query: @params.query
+                        sample: {uri: @params.sample}
+                        group: {uri: @params.group}
+                        custom: @params.custom
+                    # TODO: The nesting of API calls is quite ugly.
+                    switch @params.query
+                        when 'sample' then @app.api.sample @params.sample,
+                            success: (sample) =>
+                                params.sample = sample
+                                @show 'variant', params
+                            error: (code, message) => @error message
+                        when 'group' then @app.api.group @params.group,
+                            success: (group) =>
+                                params.group = group
+                                @show 'variant', params
+                            error: (code, message) => @error message
+                        else @show 'variant', params
                 error: (code, message) => @error message
 
         # List variants.
         @get '/variants', ->
+            query = switch @params.query
+                when 'sample' then "sample: #{ @params.sample }"
+                when 'group' then "group: #{ @params.group }"
+                when 'custom' then @params.custom
+                else '*'
             @app.api.variants
-                sample: @params.sample
+                query: query
                 region:
                     chromosome: @params.chromosome
                     begin: @params.begin
                     end: @params.end
                 page_number: parseInt @params.page ? 0
                 success: (items, pagination) =>
-                    @show 'variants',
-                        {variants: items, sample: {uri: @params.sample}},
-                        {pagination: pagination}
+                    params =
+                        variants: items
+                        query: @params.query
+                        sample: {uri: @params.sample}
+                        group: {uri: @params.group}
+                        custom: @params.custom
+                    # TODO: The nesting of API calls is quite ugly.
+                    switch @params.query
+                        when 'sample' then @app.api.sample @params.sample,
+                            success: (sample) =>
+                                params.sample = sample
+                                @show 'variants', params, pagination: pagination
+                            error: (code, message) => @error message
+                        when 'group' then @app.api.group @params.group,
+                            success: (group) =>
+                                params.group = group
+                                @show 'variants', params, pagination: pagination
+                            error: (code, message) => @error message
+                        else @show 'variants', params, pagination: pagination
                 error: (code, message) => @error message

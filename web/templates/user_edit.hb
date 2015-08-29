@@ -22,6 +22,12 @@
       <label class="checkbox">
         <input type="checkbox" name="roles" value="trader"{{#if user.roles.trader}} checked{{/if}}> Trader
       </label>
+      <label class="checkbox">
+        <input type="checkbox" name="roles" value="querier"{{#if user.roles.querier}} checked{{/if}}> Querier
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" name="roles" value="group-querier"{{#if user.roles.group_querier}} checked{{/if}}> Group querier
+      </label>
     </div>
     <div class="form-actions">
       <button type="submit" class="btn btn-warning"><i class="icon-pencil"></i> Save changes</button>
