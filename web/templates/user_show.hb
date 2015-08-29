@@ -16,7 +16,15 @@
     {{/if}}
     <tr>
       <th scope="row">Roles</th>
-      <td>{{#if user.roles}}{{user.roles}}{{else}}None{{/if}}</td>
+      <td>
+      {{#if user.roles}}
+        {{#each user.roles}}
+          {{this}}{{#unless @last}}, {{/unless}}
+        {{/each}}
+      {{else}}
+        None
+      {{/if}}
+      </td>
     </tr>
     <tr>
       <th scope="row">Added</th>
