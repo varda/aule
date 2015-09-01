@@ -2,13 +2,13 @@
   <fieldset>
     <label for="name">Name</label>
     <input type="text" class="input-xlarge" name="name" id="name">
-    <label>Data source</label>
+    <label for="data_source">Data source</label>
     <div class="form-picker input-xlarge" data-name="data_source">
       <div>
         <a href="{{base}}/picker/data_sources{{#if auth.rights.list_data_sources}}{{else}}?filter=own{{/if}}" class="picker-open">Choose a data source...</a>
       </div>
     </div>
-    <label>Sample frequencies</label>
+    <label for="sample_frequency">Sample frequencies</label>
     <div class="form-picker input-xlarge" data-name="sample_frequency" data-multi="true">
       <div>
         <a href="{{base}}/picker/samples?filter=public" class="picker-open">Add a sample...</a>

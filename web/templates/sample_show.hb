@@ -9,6 +9,18 @@
       <td><a href="{{base}}/users/{{escape sample.user.uri}}">{{sample.user.name}}</a></td>
     </tr>
     <tr>
+      <th scope="row">Groups</th>
+      <td>
+      {{#if sample.groups}}
+        {{#each sample.groups}}
+          <a href="{{base}}/groups/{{escape uri}}">{{name}}</a>{{#unless @last}}, {{/unless}}
+        {{/each}}
+      {{else}}
+        None
+      {{/if}}
+      </td>
+    </tr>
+    <tr>
       <th scope="row">Active</th>
       <td>{{#if sample.active}}Yes{{else}}No{{/if}}</td>
     </tr>

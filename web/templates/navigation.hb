@@ -10,6 +10,7 @@
         <li><a href="{{base}}/samples?filter=public">Samples</a></li>
       {{/if}}
     {{/if}}
+    <li><a href="{{base}}/groups">Groups</a></li>
     {{#if auth.rights.list_data_sources}}
       <li><a href="{{base}}/data_sources">Data sources</a></li>
     {{else}}
