@@ -13,7 +13,7 @@
 define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
 
     # Accepted server API versions.
-    ACCEPT_VERSION = '>=1.1.0,<2.0.0'
+    ACCEPT_VERSION = '>=2.0.0,<3.0.0'
 
     # Create HTTP Basic Authentication header value.
     makeBasicAuth = (login, password) ->
@@ -90,6 +90,10 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             @collection uri, 'annotation', options
 
         create_annotation: (options={}) =>
+            options.data =
+                name: options.name
+                data_source: options.data_source
+                queries: [name: 'QUERY', expression: options.query]
             success = options.success
             options.success = (data) -> success? data.annotation
             options.method = 'POST'
@@ -271,18 +275,43 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
             @collection uri, 'variation', options
 
         variant: (uri, options={}) =>
+            # The queries structure is too complex to send as a regular query
+            # string parameter and we cannot send a request body with GET, so
+            # we use the __json__ query string parameter workaround.
+            json =
+                queries: [name: 'QUERY', expression: options.query]
+                region: options.region
+            uri += "?__json__=#{ encodeURIComponent (JSON.stringify json) }"
             success = options.success
-            options.success = (data) -> success? data.variant
+            # We only support one query, so we flatten the query results.
+            success = options.success
+            options.success = (data) =>
+                variant = data.variant
+                variant.coverage = variant.annotations.QUERY.coverage
+                variant.frequency = variant.annotations.QUERY.frequency
+                variant.frequency_het = variant.annotations.QUERY.frequency_het
+                variant.frequency_hom = variant.annotations.QUERY.frequency_hom
+                success? variant
             @request uri, options
 
         variants: (options={}) =>
             uri = @uris.variants
-            region = "chromosome:#{ options.region.chromosome }"
-            region += ",begin:#{ options.region.begin }"
-            region += ",end:#{ options.region.end }"
-            uri += "?region=#{ encodeURIComponent region }"
-            if options.sample
-                uri += "&sample=#{ encodeURIComponent options.sample }"
+            # The queries structure is too complex to send as a regular query
+            # string parameter and we cannot send a request body with GET, so
+            # we use the __json__ query string parameter workaround.
+            json =
+                queries: [name: 'QUERY', expression: options.query]
+                region: options.region
+            uri += "?__json__=#{ encodeURIComponent (JSON.stringify json) }"
+            # We only support one query, so we flatten the query results.
+            success = options.success
+            options.success = (items, pagination) =>
+                for item in items
+                    item.coverage = item.annotations.QUERY.coverage
+                    item.frequency = item.annotations.QUERY.frequency
+                    item.frequency_het = item.annotations.QUERY.frequency_het
+                    item.frequency_hom = item.annotations.QUERY.frequency_hom
+                success items, pagination
             @collection uri, 'variant', options
 
         create_variant: (options={}) =>
@@ -316,9 +345,10 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
                     addAuth r, @login, @password
                     addVersion r
                     options.beforeSend? r
-                data: options.data
+                data: JSON.stringify(options.data)
                 success: options.success
                 error: ajaxError options.error
                 dataType: 'json'
                 type: options.method ? 'GET'
+                contentType: 'application/json; charset=utf-8'
             return
