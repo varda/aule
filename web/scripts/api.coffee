@@ -345,10 +345,10 @@ define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
                     addAuth r, @login, @password
                     addVersion r
                     options.beforeSend? r
-                data: JSON.stringify(options.data)
+                data: JSON.stringify options.data
                 success: options.success
                 error: ajaxError options.error
                 dataType: 'json'
                 type: options.method ? 'GET'
-                contentType: 'application/json; charset=utf-8'
+                contentType: 'application/json; charset=utf-8' if options.data?
             return
