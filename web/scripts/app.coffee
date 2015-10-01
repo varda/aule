@@ -366,6 +366,8 @@ define ['jquery',
                 @error 'Group is unchanged'
                 return
             params = {}
+            for field in @params.dirty.split ','
+                params[field] = @params[field]
             @app.api.edit_group @params.group,
                 data: params
                 success: (group) =>
