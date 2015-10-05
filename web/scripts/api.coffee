@@ -13,7 +13,7 @@
 define ['jquery', 'cs!config', 'jquery.base64'], ($, config) ->
 
     # Accepted server API versions.
-    ACCEPT_VERSION = '>=2.0.0,<3.0.0'
+    ACCEPT_VERSION = '>=3.0.0,<4.0.0'
 
     # Create HTTP Basic Authentication header value.
     makeBasicAuth = (login, password) ->
