@@ -11,21 +11,20 @@
     <tr>
       <th scope="row">Written</th>
       <td class="cell-icon">
-    {{#if annotation.task.done}}
+    {{#if_eq annotation.task.state compare="waiting"}}
+      <i class="icon-spinner icon-spin"></i>
+    {{/if_eq}}
+    {{#if_eq annotation.task.state compare="running"}}
+      <div class="progress" title="{{annotation.task.progress}}%">
+        <div class="bar" style="width: {{annotation.task.progress}}%;"></div>
+      </div>
+    {{/if_eq}}
+    {{#if_eq annotation.task.state compare="success"}}
       <i class="icon-ok"></i>
-    {{else}}
-      {{#if_eq annotation.task.state compare="failure"}}
-        <i class="icon-warning-sign" title="{{annotation.task.error.message}}"></i>
-      {{/if_eq}}
-      {{#if_eq annotation.task.state compare="started"}}
-        <i class="icon-spinner icon-spin"></i>
-      {{/if_eq}}
-      {{#if_eq annotation.task.state compare="progress"}}
-        <div class="progress" title="{{annotation.task.progress}}%">
-          <div class="bar" style="width: {{annotation.task.progress}}%;"></div>
-        </div>
-      {{/if_eq}}
-    {{/if}}
+    {{/if_eq}}
+    {{#if_eq annotation.task.state compare="failure"}}
+      <i class="icon-warning-sign" title="{{annotation.task.error.message}}"></i>
+    {{/if_eq}}
       </td>
     </tr>
     <tr>
