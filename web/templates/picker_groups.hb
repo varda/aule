@@ -6,7 +6,7 @@
     <thead><tr><th>Name</th></tr></thead>
     <tbody>
       {{#each groups}}
-      <tr data-uri="{{uri}}" data-name="{{name}}">
+      <tr data-value="{{uri}}" data-name="{{name}}">
         <td>{{name}}</td>
       </tr>
       {{/each}}

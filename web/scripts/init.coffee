@@ -65,12 +65,12 @@ define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
             app.runRoute 'get', $(this).attr('href')
 
         # Clicking a row in the picker.
-        $('#picker').on 'click', 'tbody tr[data-uri]', (e) ->
+        $('#picker').on 'click', 'tbody tr[data-value]', (e) ->
             e.preventDefault()
             source = $('#picker').data('source')
             add = $('div', source).last()
             element = $("<div>
-                <input name=\"#{ source.data 'name' }\" type=\"hidden\" value=\"#{ $(this).data 'uri' }\">
+                <input name=\"#{ source.data 'name' }\" type=\"hidden\" value=\"#{ $(this).data 'value' }\">
                 <i class=\"icon-remove\"></i> #{ $(this).data 'name' }
               </div>")
             add.before(element)
