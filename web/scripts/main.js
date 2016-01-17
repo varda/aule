@@ -25,6 +25,7 @@ requirejs.config({
 
 require({
     paths: {
+        'bluebird': 'vendor/bluebird',
         'bootstrap-alert': '../bootstrap/js/bootstrap-alert',
         'bootstrap-collapse': '../bootstrap/js/bootstrap-collapse',
         'bootstrap-modal': '../bootstrap/js/bootstrap-modal',

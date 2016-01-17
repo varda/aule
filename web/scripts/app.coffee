@@ -11,12 +11,13 @@
 
 
 define ['jquery',
+        'bluebird',
         'cs!config',
         'sammy',
         'handlebars',
         'moment',
         'jquery.base64',
-        'sammy.handlebars'], ($, config, Sammy, Handlebars, moment) ->
+        'sammy.handlebars'], ($, Promise, config, Sammy, Handlebars, moment) ->
 
     Sammy '#main', ->
 
@@ -810,31 +811,60 @@ define ['jquery',
                 when 'group' then "group: #{ @params.group }"
                 when 'custom' then @params.custom
                 else '*'
-            @app.api.variants
+            region =
+                chromosome: @params.chromosome
+                begin: @params.begin
+                end: @params.end
+            data =
+                query: @params.query
+                region: region
+
+            # TODO: Our API methods don't return promises, so we promisify
+            # some of them here. After promisification of our API this will be
+            # obsolete.
+            getVariants = (options={}) => new Promise (resolve, reject) =>
+                options.success = (items, pagination) -> resolve
+                    items: items
+                    pagination: pagination
+                options.error = (code, message) -> reject
+                    code: code
+                    message: message
+                @app.api.variants options
+
+            getSample = (uri, options={}) => new Promise (resolve, reject) =>
+                options.success = resolve
+                options.error = (code, message) -> reject
+                    code: code
+                    message: message
+                @app.api.sample uri, options
+
+            getGroup = (uri, options={}) => Promise (resolve, reject) =>
+                options.success = resolve
+                options.error = (code, message) -> reject
+                    code: code
+                    message: message
+                @app.api.group uri, options
+
+            # We have a number of independent async requests to make:
+            # 1. Get the variants from the API.
+            # 2. Get the sample or group from the API (optional).
+            requests = []
+
+            requests.push getVariants
                 query: query
-                region:
-                    chromosome: @params.chromosome
-                    begin: @params.begin
-                    end: @params.end
+                region: region
                 page_number: parseInt @params.page ? 0
-                success: (items, pagination) =>
-                    params =
-                        variants: items
-                        query: @params.query
-                        sample: {uri: @params.sample}
-                        group: {uri: @params.group}
-                        custom: @params.custom
-                    # TODO: The nesting of API calls is quite ugly.
-                    switch @params.query
-                        when 'sample' then @app.api.sample @params.sample,
-                            success: (sample) =>
-                                params.sample = sample
-                                @show 'variants', params, pagination: pagination
-                            error: (code, message) => @error message
-                        when 'group' then @app.api.group @params.group,
-                            success: (group) =>
-                                params.group = group
-                                @show 'variants', params, pagination: pagination
-                            error: (code, message) => @error message
-                        else @show 'variants', params, pagination: pagination
-                error: (code, message) => @error message
+
+            switch @params.query
+                when 'sample' then requests.push (getSample @params.sample).then (sample) ->
+                    data.sample = sample
+                when 'group' then requests.push (getGroup @params.group).then (group) ->
+                    data.group = group
+                else data.custom = @params.custom
+
+            Promise.all requests
+            .then ([result, ...]) =>
+                data.variants = result.items
+                @show 'variants', data, pagination: result.pagination
+            .catch (error) =>
+                @error error.message
