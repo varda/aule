@@ -31,6 +31,9 @@
     <li class="nav-header">Frequency lookup</li>
     <li><a href="{{base}}/lookup_variant">By variant</a></li>
     <li><a href="{{base}}/lookup_region">By region</a></li>
+    {{#if query_by_transcript }}
+      <li><a href="{{base}}/lookup_transcript">By transcript</a></li>
+    {{/if}}
     {{#if auth}}
       <li class="nav-header">Account</li>
       <li><a href="{{base}}/users/{{escape auth.user.uri}}">User profile</a></li>

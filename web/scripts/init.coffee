@@ -11,7 +11,11 @@
 #     the LESS stylesheets are downloaded and compiled.
 
 
-define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
+define ['jquery',
+        'cs!config',
+        'cs!api',
+        'cs!app',
+        'jquery.ba-throttle-debounce'], ($, config, Api, app) ->
 
     # On document ready
     $ ->
@@ -100,6 +104,11 @@ define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
                 $('div', this).remove()
                 add.appendTo this
                 add.show()
+
+        # Transcript query input element.
+        $(document).on 'input', '.transcript-querier', $.debounce 250, ->
+            route = "#{ config.RESOURCES_PREFIX }/transcript_query"
+            app.runRoute 'get', route, query: $(@).val().trim()
 
         # Show the user that we are waiting for the server.
         $(document)

@@ -1,19 +1,25 @@
 {{#title}}Variants{{/title}}
 
-<p>
+<p>Query:
 {{#if_eq query compare="global"}}
-Global query
+global
 {{/if_eq}}
 {{#if_eq query compare="sample"}}
-Sample query: <a href="{{base}}/samples/{{escape sample.uri}}">{{sample.name}}</a>
+<a href="{{base}}/samples/{{escape sample.uri}}">{{sample.name}}</a>
 {{/if_eq}}
 {{#if_eq query compare="group"}}
-Group query: <a href="{{base}}/group/{{escape group.uri}}">{{group.name}}</a>
+<a href="{{base}}/group/{{escape group.uri}}">{{group.name}}</a>
 {{/if_eq}}
 {{#if_eq query compare="custom"}}
-Custom query: <code>{{custom}}</code>
+<code>{{custom}}</code>
 {{/if_eq}}
 </p>
+
+{{#if region}}
+<p>Chromosome: {{region.chromosome}}</p>
+<p>Region begin: {{region.begin}}</p>
+<p>Region end: {{region.end}}</p>
+{{/if}}
 
 {{#if variants}}
   {{> pagination}}

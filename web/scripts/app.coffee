@@ -135,6 +135,7 @@ define ['jquery',
         # Show main page content.
         @helper 'show', (page, data={}, options={}) ->
             partials = {}
+            data.query_by_transcript = config.MY_GENE_INFO?
             data.base = config.RESOURCES_PREFIX
             data.path = @path
             data.page = page
@@ -161,6 +162,13 @@ define ['jquery',
                 data.pagination = createPagination total, current
             @render((@template "picker_#{page}"), data, partials).replace $('#picker .modal-body')
             $('#picker').modal()
+
+        # Show transcript query results.
+        @helper 'transcript_query', (data={}) ->
+            data.base = config.RESOURCES_PREFIX
+            data.path = @path
+            data.auth = createAuth()
+            @render((@template 'transcript_query'), data).replace $('#transcript-query')
 
         # Sample picker.
         @get '/picker/samples', ->
@@ -194,6 +202,53 @@ define ['jquery',
                         {groups: items, filter: @params.filter ? ''},
                         {pagination: pagination}
                 error: (code, message) => @error message
+
+        # Transcript picker.
+        @get '/picker/transcripts', ->
+            @picker 'transcripts'
+
+        # Transcript query results.
+        @get '/transcript_query', ->
+            if @params.query?.length < 1
+                @transcript_query()
+                return
+            $.ajax '//mygene.info/v2/query',
+                dataType: 'json'
+                data:
+                    q: @params.query
+                    # This limits the number of genes, which in turn may have
+                    # any number of transcripts. So this doesn't actually
+                    # correspond to the number of entries displayed but it'll
+                    # do for now. For the same reason, we can't use pagination
+                    # here.
+                    limit: config.PAGE_SIZE
+                    fields: "entrezgene,name,symbol,refseq.rna,#{ config.MY_GENE_INFO.exons_field }"
+                    species: config.MY_GENE_INFO.species
+                    entrezonly: true
+                    dotfield: false
+                    email: config.MY_GENE_INFO.email
+                success: (data) =>
+                    transcripts = []
+                    for hit in data.hits
+                        if not hit.refseq?
+                            continue
+                        rna = hit.refseq.rna
+                        if not Array.isArray rna
+                            rna = [rna]
+                        for refseq in rna
+                            if refseq of (hit[config.MY_GENE_INFO.exons_field] || [])
+                                transcripts.push
+                                    entrezgene: hit.entrezgene
+                                    symbol: hit.symbol
+                                    name: hit.name
+                                    refseq: refseq
+                    @transcript_query
+                        transcripts: transcripts
+                        # It could be that all hits outide the requested limit
+                        # (see above) fail our filters. In that case the
+                        # results displayed are actually complete, but this is
+                        # the best we can easily do.
+                        incomplete: data.hits.length < data.total
 
         # Index.
         @get '/', ->
@@ -455,11 +510,18 @@ define ['jquery',
                 error: (code, message) => @error message
             return
 
-        # Lookup variants form.
+        # Lookup variants by region form.
         @get '/lookup_region', ->
             @app.api.genome
                 success: (genome) =>
                     @show 'lookup', {chromosomes: genome.chromosomes}, {subpage: 'region'}
+                error: (code, message) => @error message
+
+        # Lookup variants by transcript form.
+        @get '/lookup_transcript', ->
+            @app.api.genome
+                success: (genome) =>
+                    @show 'lookup', {chromosomes: genome.chromosomes}, {subpage: 'transcript'}
                 error: (code, message) => @error message
 
         # List samples.
@@ -806,19 +868,6 @@ define ['jquery',
 
         # List variants.
         @get '/variants', ->
-            query = switch @params.query
-                when 'sample' then "sample: #{ @params.sample }"
-                when 'group' then "group: #{ @params.group }"
-                when 'custom' then @params.custom
-                else '*'
-            region =
-                chromosome: @params.chromosome
-                begin: @params.begin
-                end: @params.end
-            data =
-                query: @params.query
-                region: region
-
             # TODO: Our API methods don't return promises, so we promisify
             # some of them here. After promisification of our API this will be
             # obsolete.
@@ -845,26 +894,76 @@ define ['jquery',
                     message: message
                 @app.api.group uri, options
 
-            # We have a number of independent async requests to make:
-            # 1. Get the variants from the API.
-            # 2. Get the sample or group from the API (optional).
-            requests = []
+            # Query mygene.info to construct a region from the transcript
+            # (which is given as <entrezgene>/<refseq>).
+            getTranscriptRegion = (transcript) =>
+                [entrezgene, refseq] = transcript.split '/'
+                Promise.resolve $.ajax "//mygene.info/v2/gene/#{ entrezgene }",
+                    dataType: 'json'
+                    data:
+                        fields: config.MY_GENE_INFO.exons_field
+                        email: config.MY_GENE_INFO.email
+                .then (data) ->
+                    coordinates = data[config.MY_GENE_INFO.exons_field][refseq]
+                    chromosome: coordinates.chr
+                    begin: coordinates.txstart
+                    end: coordinates.txend
+                .catch ->
+                    throw new Error "Could not retrieve annotation for transcript #{ refseq }"
 
-            requests.push getVariants
-                query: query
-                region: region
-                page_number: parseInt @params.page ? 0
+            # The region to query is defined either directly, or as a
+            # transcript in the form <entrezgene>/<refseq>. We can query
+            #  mygene.info to convert the transcript into a region.
+            getRegion =
+                if @params.transcript
+                    # TODO: Optionally only look at exons of a transcript.
+                    # This can be implemented by changing the API to accept a
+                    # list of regions, or by removing the intronic variants
+                    # here manually. Preferably the former.
+                    getTranscriptRegion @params.transcript
+                else
+                    # Synchronous promise, we already have the region.
+                    Promise.resolve
+                        chromosome: @params.chromosome
+                        begin: @params.begin
+                        end: @params.end
 
-            switch @params.query
-                when 'sample' then requests.push (getSample @params.sample).then (sample) ->
-                    data.sample = sample
-                when 'group' then requests.push (getGroup @params.group).then (group) ->
-                    data.group = group
-                else data.custom = @params.custom
+            # We need the region before we can get the variants. Both are
+            # needed later.
+            getRegionAndVariants = getRegion.then (region) =>
+                getVariants
+                    query: switch @params.query
+                        when 'sample' then "sample: #{ @params.sample }"
+                        when 'group' then "group: #{ @params.group }"
+                        when 'custom' then @params.custom
+                        else '*'
+                    region: region
+                    page_number: parseInt @params.page ? 0
+                .then (result) -> [region, result]
 
-            Promise.all requests
-            .then ([result, ...]) =>
-                data.variants = result.items
+            # If querying on sample, get the sample data (name, etc). Likewise
+            # if we are querying on group.
+            getQueryParam =
+                switch @params.query
+                    when 'sample' then (getSample @params.sample).then (sample) ->
+                        ['sample', sample]
+                    when 'group' then (getGroup @params.group).then (group) ->
+                        ['group', group]
+                    else Promise.resolve ['custom', @params.custom]
+
+            Promise.all [getQueryParam, getRegionAndVariants]
+            .then ([[param, value], [region, result]]) =>
+                data =
+                    query: @params.query
+                    region: region
+                    variants: result.items
+                data[param] = value
+                # TODO: For a lookup by transcript, it might be nice to show
+                # some more information on that such as gene name, transcript
+                # accession, and perhaps even map the variant positions to the
+                # transcript.
                 @show 'variants', data, pagination: result.pagination
             .catch (error) =>
+                # TODO: Use our own Error type and only show errors of that
+                # type directly in the user interface.
                 @error error.message
