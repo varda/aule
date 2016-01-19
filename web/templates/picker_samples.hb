@@ -6,7 +6,7 @@
     <thead><tr><th>Name</th><th class="cell-icon">Active</th><th class="cell-icon">Public</th><th class="cell-icon">Notes</th><th>Added</th></tr></thead>
     <tbody>
       {{#each samples}}
-      <tr data-uri="{{uri}}" data-name="{{name}}">
+      <tr data-value="{{uri}}" data-name="{{name}}">
         <td>{{name}}</td>
         <td class="cell-icon">{{#if active}}<i class="icon-ok"></i>{{/if}}</td>
         <td class="cell-icon">{{#if public}}<i class="icon-ok"></i>{{/if}}</td>

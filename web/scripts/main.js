@@ -18,13 +18,15 @@ requirejs.config({
         'handlebars': {
             exports: 'Handlebars'
         },
-        'jquery.base64': ['jquery']
+        'jquery.base64': ['jquery'],
+        'jquery.ba-throttle-debounce': ['jquery']
     }
 });
 
 
 require({
     paths: {
+        'bluebird': 'vendor/bluebird',
         'bootstrap-alert': '../bootstrap/js/bootstrap-alert',
         'bootstrap-collapse': '../bootstrap/js/bootstrap-collapse',
         'bootstrap-modal': '../bootstrap/js/bootstrap-modal',
@@ -34,6 +36,7 @@ require({
         'handlebars': 'vendor/handlebars',
         'jquery': 'vendor/jquery',
         'jquery.base64': 'vendor/jquery.base64',
+        'jquery.ba-throttle-debounce': 'vendor/jquery.ba-throttle-debounce',
         'less': 'vendor/less',
         'marked': 'vendor/marked',
         'moment': 'vendor/moment',

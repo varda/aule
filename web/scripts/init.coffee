@@ -11,7 +11,11 @@
 #     the LESS stylesheets are downloaded and compiled.
 
 
-define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
+define ['jquery',
+        'cs!config',
+        'cs!api',
+        'cs!app',
+        'jquery.ba-throttle-debounce'], ($, config, Api, app) ->
 
     # On document ready
     $ ->
@@ -65,12 +69,12 @@ define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
             app.runRoute 'get', $(this).attr('href')
 
         # Clicking a row in the picker.
-        $('#picker').on 'click', 'tbody tr[data-uri]', (e) ->
+        $('#picker').on 'click', 'tbody tr[data-value]', (e) ->
             e.preventDefault()
             source = $('#picker').data('source')
             add = $('div', source).last()
             element = $("<div>
-                <input name=\"#{ source.data 'name' }\" type=\"hidden\" value=\"#{ $(this).data 'uri' }\">
+                <input name=\"#{ source.data 'name' }\" type=\"hidden\" value=\"#{ $(this).data 'value' }\">
                 <i class=\"icon-remove\"></i> #{ $(this).data 'name' }
               </div>")
             add.before(element)
@@ -100,6 +104,11 @@ define ['jquery', 'cs!config', 'cs!api', 'cs!app'], ($, config, Api, app) ->
                 $('div', this).remove()
                 add.appendTo this
                 add.show()
+
+        # Transcript query input element.
+        $(document).on 'input', '.transcript-querier', $.debounce 250, ->
+            route = "#{ config.RESOURCES_PREFIX }/transcript_query"
+            app.runRoute 'get', route, query: $(@).val().trim()
 
         # Show the user that we are waiting for the server.
         $(document)

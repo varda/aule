@@ -6,7 +6,7 @@
     <thead><tr><th>Name</th><th>Filetype</th><th>Added</th></tr></thead>
     <tbody>
       {{#each data_sources}}
-      <tr data-uri="{{uri}}" data-name="{{name}}">
+      <tr data-value="{{uri}}" data-name="{{name}}">
         <td>{{name}}</td>
         <td>{{filetype}}</td>
         <td>{{dateFormat added}}</td>
