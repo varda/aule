@@ -486,10 +486,7 @@ define ['jquery',
 
         # Lookup variant form.
         @get '/lookup_variant', ->
-            @app.api.genome
-                success: (genome) =>
-                    @show 'lookup', {chromosomes: genome.chromosomes}, {subpage: 'variant'}
-                error: (code, message) => @error message
+            @show 'lookup', {}, {subpage: 'variant'}
 
         # Lookup variant.
         @post '/lookup_variant', ->
@@ -519,10 +516,7 @@ define ['jquery',
 
         # Lookup variants by transcript form.
         @get '/lookup_transcript', ->
-            @app.api.genome
-                success: (genome) =>
-                    @show 'lookup', {chromosomes: genome.chromosomes}, {subpage: 'transcript'}
-                error: (code, message) => @error message
+            @show 'lookup', {}, {subpage: 'transcript'}
 
         # List samples.
         @get '/samples', ->
