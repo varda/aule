@@ -1,1 +1,4 @@
-web/scripts/config.coffee
+node_modules/
+dist/
+.tmp
+npm-debug.log
