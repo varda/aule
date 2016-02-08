@@ -58,7 +58,7 @@ The bundle and accompanying files can now be found in the `dist`
 subdirectory.
 
 Alternatively, pre-compiled bundles can be found from the
-[GitHub releases page](https://github.com/varda/aule-test/releases).
+[GitHub releases page](https://github.com/varda/aule/releases).
 
 Automated configuration and deployment of a server running Varda and Aulë is
 available in the
