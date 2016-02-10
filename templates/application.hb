@@ -10,7 +10,7 @@
         <li><a href="https://github.com/varda/varda">Varda</a></li>
         <li><a href="https://github.com/varda/manwe">Manwë</a></li>
       </ul>
-      <p id="waiting" class="nav navbar-text muted">(loading...)</p>
+      <p id="waiting" class="nav muted">(loading...)</p>
       <div class="nav-collapse collapse">
         <form class="navbar-form pull-right" action="{{uri base 'authenticate'}}" method="post" id="form-authenticate">
           <input class="input-small" type="text" placeholder="Login" name="login">
