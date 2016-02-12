@@ -45,7 +45,7 @@
 
 {{#*inline 'add'}}
 
-<form action="{{uri base 'data_sources' data_source.uri 'annotations'}}" method="post">
+<form action="{{uri base 'annotations'}}" method="post">
   <fieldset>
 
 <label for="name">Name</label>
