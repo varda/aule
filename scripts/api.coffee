@@ -8,7 +8,6 @@
 
 
 # Todo: Cache resources.
-# Todo: Proper URI construction instead of string concatenations.
 
 
 $ = require 'jquery'
@@ -68,14 +67,15 @@ class Api
         variations: root.variation_collection.uri
 
   annotation: (uri) =>
-    @request uri + '?embed=original_data_source,annotated_data_source'
+    @request URI(uri).setQuery 'embed',
+      'original_data_source,annotated_data_source'
     .then ({annotation}) -> annotation
 
   annotations: ({filter, page_number}={}) =>
-    uri = @uris.annotations +
-          '?embed=original_data_source,annotated_data_source'
-    uri += '&annotated_data_source.user=' +
-           encodeURIComponent @current_user?.uri if filter == 'own'
+    uri = URI(@uris.annotations).setQuery 'embed',
+      'original_data_source,annotated_data_source'
+    if filter == 'own'
+      uri.setQuery 'annotated_data_source.user', @current_user?.uri
     @collection uri, 'annotation', {page_number}
 
   create_annotation: (data) =>
@@ -95,17 +95,17 @@ class Api
           "Unable to authenticate with login '#{@login}' and password '***'"
 
   coverages: ({sample, page_number}={}) =>
-    uri = @uris.coverages + '?embed=data_source'
-    uri += "&sample=#{ encodeURIComponent sample }" if sample?
+    uri = URI(@uris.coverages).setQuery 'embed', 'data_source'
+    uri.setQuery 'sample', sample if sample?
     @collection uri, 'coverage', {page_number}
 
   data_source: (uri) =>
-    @request uri + '?embed=user'
+    @request URI(uri).setQuery 'embed', 'user'
     .then ({data_source}) -> data_source
 
   data_sources: ({filter, page_number}={}) =>
-    uri = @uris.data_sources
-    uri += "?user=#{ encodeURIComponent @current_user?.uri }" if filter == 'own'
+    uri = URI @uris.data_sources
+    uri.setQuery 'user', @current_user?.uri if filter == 'own'
     @collection uri, 'data_source', {page_number}
 
   create_data_source: (data) =>
@@ -142,14 +142,14 @@ class Api
     @request uri, method: 'DELETE'
 
   sample: (uri) =>
-    @request uri + '?embed=user,groups'
+    @request URI(uri).setQuery embed: 'user,groups'
     .then ({sample}) -> sample
 
   samples: ({filter, group, page_number}={}) =>
-    uri = @uris.samples
-    uri += "?user=#{ encodeURIComponent @current_user?.uri }" if filter == 'own'
-    uri += '?public=true' if filter == 'public'
-    uri += "?groups=#{ encodeURIComponent group }" if group?
+    uri = URI @uris.samples
+    uri.setQuery 'user', @current_user?.uri if filter == 'own'
+    uri.setQuery 'public', 'true' if filter == 'public'
+    uri.setQuery 'groups', group if group?
     @collection uri, 'sample', {page_number}
 
   create_sample: (data) =>
@@ -168,8 +168,8 @@ class Api
     .then ({token}) -> token
 
   tokens: ({filter, page_number}={}) =>
-    uri = @uris.tokens
-    uri += "?user=#{ encodeURIComponent @current_user?.uri }" if filter == 'own'
+    uri = URI @uris.tokens
+    uri.setQuery 'user', @current_user?.uri if filter == 'own'
     @collection uri, 'token', {page_number}
 
   create_token: (data) =>
@@ -202,8 +202,8 @@ class Api
     @request uri, method: 'DELETE'
 
   variations: ({sample, page_number}={}) =>
-    uri = @uris.variations + '?embed=data_source'
-    uri += "&sample=#{ encodeURIComponent sample }" if sample?
+    uri = URI(@uris.variations).setQuery 'embed', 'data_source'
+    uri.setQuery 'sample', sample if sample?
     @collection uri, 'variation', {page_number}
 
   variant: (uri, {query, region}={}) =>
@@ -213,8 +213,7 @@ class Api
     json =
       queries: [name: 'QUERY', expression: query]
       region: region
-    uri += "?__json__=#{ encodeURIComponent (JSON.stringify json) }"
-    @request uri
+    @request URI(uri).setQuery '__json__', JSON.stringify(json)
     .then ({variant}) ->
       # We only support one query, so we flatten the query results.
       variant.coverage = variant.annotations.QUERY.coverage
@@ -231,8 +230,8 @@ class Api
     json =
       queries: [name: 'QUERY', expression: query]
       region: region
-    uri += "?__json__=#{ encodeURIComponent (JSON.stringify json) }"
-    @collection uri, 'variant', {page_number}
+    @collection URI(uri).setQuery('__json__', JSON.stringify(json)),
+      'variant', {page_number}
     .then ({items, pagination}) ->
       # We only support one query, so we flatten the query results.
       for item in items
@@ -266,8 +265,7 @@ class Api
       pagination: {total: 0, current: 0}
 
   request: (uri, options={}) =>
-    uri = URI(uri).absoluteTo(@root).toString()
-    xhr = $.ajax uri,
+    xhr = $.ajax URI(uri).absoluteTo(@root).toString(),
       beforeSend: (r) =>
         addAuth r, @login, @password
         addVersion r
