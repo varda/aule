@@ -1,7 +1,7 @@
 {
   "name": "aule",
   "title": "Aulë",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A web interface to the Varda database for genomic variation frequencies",
   "license": "MIT",
   "main": "scripts/init.coffee",
