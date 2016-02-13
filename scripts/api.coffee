@@ -11,6 +11,7 @@
 
 
 $ = require 'jquery'
+Promise = require 'bluebird'
 URI = require 'urijs'
 
 config = require 'config'
@@ -37,329 +38,264 @@ addRangeForPage = (page, page_size=config.PAGE_SIZE) ->
   end = start + page_size - 1
   (r) -> r.setRequestHeader 'Range', "items=#{ start }-#{ end }"
 
-# Normalize ajax error handling.
-ajaxError = (handler) ->
-  (xhr) ->
-    try
-      error = ($.parseJSON xhr.responseText).error
-    catch e
-      if not xhr.status
-        error =
-          code: 'connection_error',
-          message: 'Unable to connect to server'
-      else if xhr.status == 503
-        error =
-          code: 'maintenance',
-          message: 'The server is currently undergoing maintenance'
-      else
-        error =
-          code: 'response_error',
-          message: "Unable to parse server response (status: #{xhr.status} #{xhr.statusText})"
-        console.log 'Unable to parse server response'
-        console.log xhr.responseText
-    handler? error.code, error.message
+
+class ApiError extends Error
+  constructor: (@code, @message) ->
+    @name = 'ApiError'
+
 
 class Api
   constructor: (@root) ->
 
-  init: ({success, error}) =>
-    @request @root,
-      error: error
-      success: (r) =>
-        if r.root.status != 'ok'
-          error? 'response_error', 'Unexpected response from server'
-          return
-        @uris =
-          root: @root
-          authentication: r.root.authentication.uri
-          genome: r.root.genome.uri
-          annotations: r.root.annotation_collection.uri
-          coverages: r.root.coverage_collection.uri
-          data_sources: r.root.data_source_collection.uri
-          groups: r.root.group_collection.uri
-          samples: r.root.sample_collection.uri
-          tokens: r.root.token_collection.uri
-          users: r.root.user_collection.uri
-          variants: r.root.variant_collection.uri
-          variations: r.root.variation_collection.uri
-        success?()
+  init: =>
+    @request @root
+    .then ({root}) =>
+      if root.status != 'ok'
+        throw new ApiError 'response_error', 'Unexpected response from server'
+      @uris =
+        root: @root
+        authentication: root.authentication.uri
+        genome: root.genome.uri
+        annotations: root.annotation_collection.uri
+        coverages: root.coverage_collection.uri
+        data_sources: root.data_source_collection.uri
+        groups: root.group_collection.uri
+        samples: root.sample_collection.uri
+        tokens: root.token_collection.uri
+        users: root.user_collection.uri
+        variants: root.variant_collection.uri
+        variations: root.variation_collection.uri
 
-  annotation: (uri, options={}) =>
-    # Todo: Proper URI construction.
-    uri += '?embed=original_data_source,annotated_data_source'
-    success = options.success
-    options.success = (data) -> success? data.annotation
-    @request uri, options
+  annotation: (uri) =>
+    @request URI(uri).setQuery 'embed',
+      'original_data_source,annotated_data_source'
+    .then ({annotation}) -> annotation
 
-  annotations: (options={}) =>
-    uri = @uris.annotations + '?embed=original_data_source,annotated_data_source'
-    if options.filter == 'own'
-      uri += "&annotated_data_source.user=#{ encodeURIComponent @current_user?.uri }"
-    @collection uri, 'annotation', options
+  annotations: ({filter, page_number}={}) =>
+    uri = URI(@uris.annotations).setQuery 'embed',
+      'original_data_source,annotated_data_source'
+    if filter == 'own'
+      uri.setQuery 'annotated_data_source.user', @current_user?.uri
+    @collection uri, 'annotation', {page_number}
 
-  create_annotation: (options={}) =>
-    options.data =
-      name: options.name
-      data_source: options.data_source
-      queries: [name: 'QUERY', expression: options.query]
-    success = options.success
-    options.success = (data) -> success? data.annotation
-    options.method = 'POST'
-    @request @uris.annotations, options
+  create_annotation: (data) =>
+    data.queries = [name: 'QUERY', expression: data.query]
+    delete data.query
+    @request @uris.annotations, {data, method: 'POST'}
+    .then ({annotation}) -> annotation
 
-  authenticate: (@login, @password, {success, error}) =>
+  authenticate: (@login, @password) =>
     @current_user = null
-    @request @uris.authentication,
-      success: (r) =>
-        if r.authentication.authenticated
-          @current_user = r.authentication.user
-          success?()
-        else
-          error? 'authentication_error',
-            "Unable to authenticate with login '#{@login}' and password '***'"
-      error: error
+    @request @uris.authentication
+    .then ({authentication}) =>
+      if authentication.authenticated
+        @current_user = authentication.user
+      else
+        throw new ApiError 'authentication_error',
+          "Unable to authenticate with login '#{@login}' and password '***'"
 
-  coverages: (options={}) =>
-    uri = @uris.coverages + '?embed=data_source'
-    if options.sample?
-      uri += "&sample=#{ encodeURIComponent options.sample }"
-    @collection uri, 'coverage', options
+  coverages: ({sample, page_number}={}) =>
+    uri = URI(@uris.coverages).setQuery 'embed', 'data_source'
+    uri.setQuery 'sample', sample if sample?
+    @collection uri, 'coverage', {page_number}
 
-  data_source: (uri, options={}) =>
-    uri += '?embed=user'  # Todo: Proper URI construction.
-    success = options.success
-    options.success = (data) -> success? data.data_source
-    @request uri, options
+  data_source: (uri) =>
+    @request URI(uri).setQuery 'embed', 'user'
+    .then ({data_source}) -> data_source
 
-  data_sources: (options={}) =>
-    uri = @uris.data_sources
-    if options.filter == 'own'
-      uri += "?user=#{ encodeURIComponent @current_user?.uri }"
-    @collection uri, 'data_source', options
+  data_sources: ({filter, page_number}={}) =>
+    uri = URI @uris.data_sources
+    uri.setQuery 'user', @current_user?.uri if filter == 'own'
+    @collection uri, 'data_source', {page_number}
 
-  create_data_source: (options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.data_source
-    options.method = 'POST'
-    @request @uris.data_sources, options
+  create_data_source: (data) =>
+    @request @uris.data_sources, {data, method: 'POST'}
+    .then ({data_source}) -> data_source
 
-  edit_data_source: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.data_source
-    options.method = 'PATCH'
-    @request uri, options
+  edit_data_source: (uri, data) =>
+    @request uri, {data, method: 'PATCH'}
+    .then ({data_source}) -> data_source
 
-  delete_data_source: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success?()
-    options.method = 'DELETE'
-    @request uri, options
+  delete_data_source: (uri) =>
+    @request uri, method: 'DELETE'
 
-  genome: (options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.genome
-    @request @uris.genome, options
+  genome: =>
+    @request @uris.genome
+    .then ({genome}) -> genome
 
-  group: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.group
-    @request uri, options
+  group: (uri) =>
+    @request uri
+    .then ({group}) -> group
 
-  groups: (options={}) =>
-    @collection @uris.groups, 'group', options
+  groups: ({page_number}={}) =>
+    @collection @uris.groups, 'group', {page_number}
 
-  create_group: (options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.group
-    options.method = 'POST'
-    @request @uris.groups, options
+  create_group: (data) =>
+    @request @uris.groups, {data, method: 'POST'}
+    .then ({group}) -> group
 
-  edit_group: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.group
-    options.method = 'PATCH'
-    @request uri, options
+  edit_group: (uri, data) =>
+    @request uri, {data, method: 'PATCH'}
+    .then ({group}) -> group
 
-  delete_group: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success?()
-    options.method = 'DELETE'
-    @request uri, options
+  delete_group: (uri) =>
+    @request uri, method: 'DELETE'
 
-  sample: (uri, options={}) =>
-    uri += '?embed=user,groups'  # Todo: Proper URI construction.
-    success = options.success
-    options.success = (data) -> success? data.sample
-    @request uri, options
+  sample: (uri) =>
+    @request URI(uri).setQuery embed: 'user,groups'
+    .then ({sample}) -> sample
 
-  samples: (options={}) =>
-    uri = @uris.samples
-    if options.filter == 'own'
-      uri += "?user=#{ encodeURIComponent @current_user?.uri }"
-    if options.filter == 'public'
-      uri += '?public=true'
-    if options.group?
-      uri += "?groups=#{ encodeURIComponent options.group }"
-    @collection uri, 'sample', options
+  samples: ({filter, group, page_number}={}) =>
+    uri = URI @uris.samples
+    uri.setQuery 'user', @current_user?.uri if filter == 'own'
+    uri.setQuery 'public', 'true' if filter == 'public'
+    uri.setQuery 'groups', group if group?
+    @collection uri, 'sample', {page_number}
 
-  create_sample: (options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.sample
-    options.method = 'POST'
-    @request @uris.samples, options
+  create_sample: (data) =>
+    @request @uris.samples, {data, method: 'POST'}
+    .then ({sample}) -> sample
 
-  edit_sample: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.sample
-    options.method = 'PATCH'
-    @request uri, options
+  edit_sample: (uri, data) =>
+    @request uri, {data, method: 'PATCH'}
+    .then ({sample}) -> sample
 
-  delete_sample: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success?()
-    options.method = 'DELETE'
-    @request uri, options
+  delete_sample: (uri) =>
+    @request uri, method: 'DELETE'
 
-  token: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.token
-    @request uri, options
+  token: (uri) =>
+    @request uri
+    .then ({token}) -> token
 
-  tokens: (options={}) =>
-    uri = @uris.tokens
-    if options.filter == 'own'
-      uri += "?user=#{ encodeURIComponent @current_user?.uri }"
-    @collection uri, 'token', options
+  tokens: ({filter, page_number}={}) =>
+    uri = URI @uris.tokens
+    uri.setQuery 'user', @current_user?.uri if filter == 'own'
+    @collection uri, 'token', {page_number}
 
-  create_token: (options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.token
-    options.method = 'POST'
-    @request @uris.tokens, options
+  create_token: (data) =>
+    @request @uris.tokens, {data, method: 'POST'}
+    .then ({token}) -> token
 
-  edit_token: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.token
-    options.method = 'PATCH'
-    @request uri, options
+  edit_token: (uri, data) =>
+    @request uri, {data, method: 'PATCH'}
+    .then ({token}) -> token
 
-  delete_token: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success?()
-    options.method = 'DELETE'
-    @request uri, options
+  delete_token: (uri) =>
+    @request uri, method: 'DELETE'
 
-  user: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.user
-    @request uri, options
+  user: (uri) =>
+    @request uri
+    .then ({user}) -> user
 
-  users: (options={}) =>
-    @collection @uris.users, 'user', options
+  users: ({page_number}={}) =>
+    @collection @uris.users, 'user', {page_number}
 
-  create_user: (options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.user
-    options.method = 'POST'
-    @request @uris.users, options
+  create_user: (data) =>
+    @request @uris.users, {data, method: 'POST'}
+    .then ({user}) -> user
 
-  edit_user: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.user
-    options.method = 'PATCH'
-    @request uri, options
+  edit_user: (uri, data) =>
+    @request uri, {data, method: 'PATCH'}
+    .then ({user}) -> user
 
-  delete_user: (uri, options={}) =>
-    success = options.success
-    options.success = (data) -> success?()
-    options.method = 'DELETE'
-    @request uri, options
+  delete_user: (uri) =>
+    @request uri, method: 'DELETE'
 
-  variations: (options={}) =>
-    uri = @uris.variations + '?embed=data_source'
-    if options.sample?
-      uri += "&sample=#{ encodeURIComponent options.sample }"
-    @collection uri, 'variation', options
+  variations: ({sample, page_number}={}) =>
+    uri = URI(@uris.variations).setQuery 'embed', 'data_source'
+    uri.setQuery 'sample', sample if sample?
+    @collection uri, 'variation', {page_number}
 
-  variant: (uri, options={}) =>
+  variant: (uri, {query, region}={}) =>
     # The queries structure is too complex to send as a regular query string
     # parameter and we cannot send a request body with GET, so we use the
     # __json__ query string parameter workaround.
     json =
-      queries: [name: 'QUERY', expression: options.query]
-      region: options.region
-    uri += "?__json__=#{ encodeURIComponent (JSON.stringify json) }"
-    success = options.success
-    # We only support one query, so we flatten the query results.
-    success = options.success
-    options.success = (data) ->
-      variant = data.variant
+      queries: [name: 'QUERY', expression: query]
+      region: region
+    @request URI(uri).setQuery '__json__', JSON.stringify(json)
+    .then ({variant}) ->
+      # We only support one query, so we flatten the query results.
       variant.coverage = variant.annotations.QUERY.coverage
       variant.frequency = variant.annotations.QUERY.frequency
       variant.frequency_het = variant.annotations.QUERY.frequency_het
       variant.frequency_hom = variant.annotations.QUERY.frequency_hom
-      success? variant
-    @request uri, options
+      variant
 
-  variants: (options={}) =>
+  variants: ({query, region, page_number}={}) =>
     uri = @uris.variants
     # The queries structure is too complex to send as a regular query string
     # parameter and we cannot send a request body with GET, so we use the
     # __json__ query string parameter workaround.
     json =
-      queries: [name: 'QUERY', expression: options.query]
-      region: options.region
-    uri += "?__json__=#{ encodeURIComponent (JSON.stringify json) }"
-    # We only support one query, so we flatten the query results.
-    success = options.success
-    options.success = (items, pagination) ->
+      queries: [name: 'QUERY', expression: query]
+      region: region
+    @collection URI(uri).setQuery('__json__', JSON.stringify(json)),
+      'variant', {page_number}
+    .then ({items, pagination}) ->
+      # We only support one query, so we flatten the query results.
       for item in items
         item.coverage = item.annotations.QUERY.coverage
         item.frequency = item.annotations.QUERY.frequency
         item.frequency_het = item.annotations.QUERY.frequency_het
         item.frequency_hom = item.annotations.QUERY.frequency_hom
-      success items, pagination
-    @collection uri, 'variant', options
+      {items, pagination}
 
-  create_variant: (options={}) =>
-    success = options.success
-    options.success = (data) -> success? data.variant
-    options.method = 'POST'
-    @request @uris.variants, options
+  create_variant: (data) =>
+    @request @uris.variants, {data, method: 'POST'}
+    .then ({variant}) -> variant
 
   collection: (uri, type, options={}) =>
     options.page_number ?= 0
     options.page_size ?= config.PAGE_SIZE
     @request uri,
       beforeSend: addRangeForPage options.page_number, config.PAGE_SIZE
-      success: (data, status, xhr) ->
-        range = xhr.getResponseHeader 'Content-Range'
-        total = parseInt (range.split '/')[1]
-        pagination =
-          total: Math.ceil total / options.page_size
-          current: options.page_number
-        options.success? data["#{ type }_collection"].items, pagination
-      error: (code, message) ->
-        if code == 'unsatisfiable_range'
-          options.success? [], total: 0, current: 0
-        else
-          options.error? code, message
       data: options.data
+      includeXhr: true
+    .then ({data, xhr}) ->
+      range = xhr.getResponseHeader 'Content-Range'
+      total = parseInt (range.split '/')[1]
+      pagination =
+        total: Math.ceil total / options.page_size
+        current: options.page_number
+      items: data["#{ type }_collection"].items
+      pagination: pagination
+    .catch code: 'unsatisfiable_range', ->
+      items: []
+      pagination: {total: 0, current: 0}
 
   request: (uri, options={}) =>
-    uri = URI(uri).absoluteTo(@root).toString()
-    $.ajax uri,
+    xhr = $.ajax URI(uri).absoluteTo(@root).toString(),
       beforeSend: (r) =>
         addAuth r, @login, @password
         addVersion r
         options.beforeSend? r
       data: JSON.stringify options.data
-      success: options.success
-      error: ajaxError options.error
       dataType: 'json'
       type: options.method ? 'GET'
       contentType: 'application/json; charset=utf-8' if options.data?
-    return
+    Promise.resolve xhr
+    .then (data) ->
+      # Promisifying $.ajax we loose the jqXHR object. In rare situations we
+      # still need that, so we optionally return a wrapper object.
+      if options.includeXhr then {data, xhr} else data
+    .catch ({status, responseText}) ->
+      try
+        {code, message} = ($.parseJSON responseText).error
+      catch e
+        if not status
+          code = 'connection_error'
+          message = 'Unable to connect to server'
+        else if status == 503
+          code = 'maintenance'
+          message = 'The server is currently undergoing maintenance'
+        else
+          code = 'response_error'
+          message = "Unable to parse server response
+                     (status: #{status} #{statusText})"
+          console.log 'Unable to parse server response'
+          console.log responseText
+      throw new ApiError code, message
 
 
-module.exports = Api
+module.exports = {ApiError, Api}

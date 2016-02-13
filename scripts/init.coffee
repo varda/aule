@@ -11,8 +11,9 @@ $ = require 'jquery'
 td = require 'throttle-debounce'
 
 config = require 'config'
-Api = require './api'
+{ApiError, Api} = require './api'
 app = require './app'
+
 
 require 'bootstrap/js/bootstrap-alert'
 require 'bootstrap/js/bootstrap-collapse'
@@ -57,8 +58,8 @@ $ ->
   # Keep track of dirty fields in edit forms.
   $(document).on 'input', '.form-edit :input', ->
     setDirty $(@), $("label[for='#{ @id }']")
-  $(document).on 'change','.form-edit input:checkbox, .form-edit input:radio', ->
-    setDirty $(@), $(@).parent('label')
+  $(document).on 'change','.form-edit input:checkbox, .form-edit input:radio',
+    -> setDirty $(@), $(@).parent('label')
   $(document).on 'reset', '.form-edit', ->
     $(':input, .form-picker, label', @).removeClass 'dirty'
     $('#dirty', @).val []
@@ -80,7 +81,8 @@ $ ->
     source = $('#picker').data('source')
     add = $('div', source).last()
     element = $("<div>
-      <input name=\"#{ source.data 'name' }\" type=\"hidden\" value=\"#{ $(this).data 'value' }\">
+      <input name=\"#{ source.data 'name' }\" type=\"hidden\"
+             value=\"#{ $(this).data 'value' }\">
       <i class=\"fa fa-remove\"></i> #{ $(this).data 'name' }
     </div>")
     add.before(element)
@@ -127,15 +129,13 @@ $ ->
   # Instantiate API client and run app.
   $('body').html require('../templates/loading.hb')()
   api = new Api config.API_ROOT
-  api.init
-    error: (code, message) ->
-      $('body').html require('../templates/loading_error.hb') error:
-        code: code
-        message: message
-    success: ->
-      $('body').html require('../templates/application.hb') base: config.BASE
-      app.init api
-      app.run()
+  api.init()
+  .then ->
+    $('body').html require('../templates/application.hb') base: config.BASE
+    app.init api
+    app.run()
+  .catch ApiError, (error) ->
+    $('body').html require('../templates/loading_error.hb') error: error
 
 
 module.exports = {}

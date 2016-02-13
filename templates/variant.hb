@@ -3,18 +3,18 @@
 <dl class="dl-horizontal">
   <dt>Query</dt>
   <dd>
-    {{#equals query 'global'}}
-    Global query
-    {{/equals}}
-    {{#equals query 'sample'}}
-    Sample query: <a href="{{uri base 'samples' sample.uri}}">{{sample.name}}</a>
-    {{/equals}}
-    {{#equals query 'group'}}
-    Group query: <a href="{{uri base 'group' group.uri}}">{{group.name}}</a>
-    {{/equals}}
-    {{#equals query 'custom'}}
-    Custom query: <code>{{custom}}</code>
-    {{/equals}}
+{{#equals query 'global'}}
+global
+{{/equals}}
+{{#equals query 'sample'}}
+<a href="{{uri base 'samples' sample.uri}}">{{sample.name}}</a>
+{{/equals}}
+{{#equals query 'group'}}
+<a href="{{uri base 'group' group.uri}}">{{group.name}}</a>
+{{/equals}}
+{{#equals query 'custom'}}
+<code>{{custom}}</code>
+{{/equals}}
   </dd>
   <dt>Chromosome</dt>
   <dd>{{variant.chromosome}}</dd>
