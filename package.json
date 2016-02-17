@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "scripts/init.coffee",
   "scripts": {
-    "dev": "webpack-dev-server --progress --colors --port 8000 --config webpack.config.js --bail",
+    "dev": "webpack-dev-server --progress --colors --port 8000 --config webpack.config.js",
     "clean": "rm -Rf dist",
     "dist": "npm run clean && webpack -p --config webpack.config.js --bail"
   },
