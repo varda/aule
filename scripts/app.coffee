@@ -216,10 +216,6 @@ app = Sammy '#main', ->
       throw new ApiError 'mygeneinfo_error',
         "MyGene.info query failed: #{ @params.query }"
 
-  # Homepage.
-  @get '/', ->
-    @show 'home'
-
   # Authenticate.
   @post '/authenticate', ->
     $('#form-authenticate').removeClass 'success fail'
@@ -905,6 +901,11 @@ app = Sammy '#main', ->
       # perhaps even map the variant positions to the transcript.
       @show 'variants', data
     .catch ApiError, ({message}) => @error message
+
+  # Homepage.
+  # This route acts as a catchall and must be defined last.
+  @get '', ->
+    @show 'home'
 
 
 module.exports = app
