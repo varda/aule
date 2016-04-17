@@ -75,6 +75,24 @@ The `index.html` in this repository includes the default `AULE_CONFIG` from
 `config.js`. Please modify this file to your needs.
 
 
+Dependency management
+---------------------
+
+In order to have somewhat reproducible builds, we use
+[npm shrinkwrap](https://docs.npmjs.com/cli/shrinkwrap) to lock down all
+dependencies. To add or update a dependency, run:
+
+    npm install --save --save-exact some-dependency@some-version
+
+Or, if it's a dev dependency:
+
+    npm install --save-dev --save-exact some-dev-dependency@some-version
+
+Then update the shrinkwrap:
+
+    npm shrinkwrap --dev
+
+
 Copyright
 ---------
 
